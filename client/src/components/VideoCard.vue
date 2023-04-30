@@ -32,7 +32,7 @@
             </div>
         </div>
         <!-- <hr v-show="this.inputSearch || this.myVideos" /> -->
-        <div class="container-fluid row row-cols-md-3">
+        <div class="container-fluid row row-cols-md-3 pt-3">
             <div
                 class="card bg-transparent border-0"
                 v-for="(video, index) in videosShow"
@@ -149,6 +149,7 @@ export default {
                         id,
                     );
                     this.videos = temp.myVideos;
+                    this.videosShow = this.videos;
                     this.isLoading = false;
                     this.extraStore.myAlert(
                         'success',
@@ -183,6 +184,7 @@ export default {
                         this.accountStore.account._id,
                     );
                     this.videos = [];
+                    this.videosShow = [];
                     this.isLoading = false;
 
                     // await this.accountStore.refresh();
@@ -203,7 +205,7 @@ export default {
     computed: {},
     async mounted() {
         await this.getAllVideos();
-        if (!this.inputSearch) {
+        if (this.$route.name === 'home') {
             if (this.region === 'VN')
                 this.videosShow = this.videos.filter(
                     (video) => video.region === 'VN',
@@ -212,12 +214,15 @@ export default {
                 this.videosShow = this.videos.filter(
                     (video) => video.region === 'US',
                 );
+            else if (this.region === 'JP')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'JP',
+                );
             else
                 this.videosShow = this.videos.filter(
                     (video) => video.region === 'KR',
                 );
         } else this.videosShow = this.videos;
-        console.log(this.videosShow);
         this.isLoading = false;
     },
 };

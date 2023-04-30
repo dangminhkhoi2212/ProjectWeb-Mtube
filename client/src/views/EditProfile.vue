@@ -169,7 +169,6 @@ export default {
                     `${url_local}/account/${this.account._id}`,
                     form,
                 );
-                await this.accountStore.refresh();
                 this.isLoading = false;
                 this.extraStore.myAlert('success', ' Updated successfully 🥳');
             } catch (err) {
@@ -181,8 +180,10 @@ export default {
             }
         },
     },
-    mounted() {
+    async mounted() {
         this.isLoading = false;
+        await this.accountStore.refresh();
+
         this.fullPage = false;
     },
 };

@@ -21,12 +21,21 @@
             <li>|</li>
             <li
                 role="button"
+                :class="{ active_link: region === 'JP' }"
+                class="fs-5"
+                @click="changeRegion('JP')">
+                Japan
+            </li>
+            <li>|</li>
+            <li
+                role="button"
                 :class="{ active_link: region === 'KR' }"
                 class="fs-5"
                 @click="changeRegion('KR')">
                 Korea
             </li>
         </ul>
+        <hr />
         <VideoCard
             :inputSearch="null"
             :key="region"
@@ -35,10 +44,6 @@
 </template>
 <script>
 import VideoCard from '../components/VideoCard.vue';
-import Header from '../components/Header.vue';
-
-import Navigation from '../components/Navigation.vue';
-import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
 export default {
@@ -58,7 +63,6 @@ export default {
     methods: {
         changeRegion(region) {
             this.region = region;
-            console.log(this.region);
         },
     },
     computed: {},

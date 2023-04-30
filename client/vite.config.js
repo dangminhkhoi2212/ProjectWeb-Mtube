@@ -5,7 +5,6 @@ import vue from '@vitejs/plugin-vue';
 const url_local = 'http://localhost:3000';
 // const url_local = 'https://minhkhoi.cyclic.app';
 
-// https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue()],
     resolve: {
