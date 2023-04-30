@@ -11,6 +11,14 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen></iframe>
             </div>
+            <iframe
+                width="942"
+                height="530"
+                src="https://www.youtube.com/embed/TB3QxvURpGE"
+                title="Da-iCE - Star Mine / THE FIRST TAKE"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
             <div class="mx-1">
                 <p class="p-3 fs-2">
                     {{ video.title }}
