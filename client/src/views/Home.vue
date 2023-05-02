@@ -1,7 +1,7 @@
 <template>
     <section id="main">
         <ul
-            class="px-4 d-flex gap-3 mt-5 mt-sm-0 overflow-auto vw-100"
+            class="px-4 d-flex gap-3 mt-5 mt-sm-0 pt-3 pt-sm-0 overflow-auto vw-100"
             style="white-space: nowrap; width: 100vw">
             <li
                 role="button"
@@ -21,6 +21,22 @@
             <li>|</li>
             <li
                 role="button"
+                :class="{ active_link: region === 'FR' }"
+                class="fs-5"
+                @click="changeRegion('FR')">
+                France
+            </li>
+            <li>|</li>
+            <li
+                role="button"
+                :class="{ active_link: region === 'RU' }"
+                class="fs-5"
+                @click="changeRegion('RU')">
+                Russia
+            </li>
+            <li>|</li>
+            <li
+                role="button"
                 :class="{ active_link: region === 'JP' }"
                 class="fs-5"
                 @click="changeRegion('JP')">
@@ -33,6 +49,30 @@
                 class="fs-5"
                 @click="changeRegion('KR')">
                 Korea
+            </li>
+            <li>|</li>
+            <li
+                role="button"
+                :class="{ active_link: region === 'TH' }"
+                class="fs-5"
+                @click="changeRegion('TH')">
+                ThaiLand
+            </li>
+            <li>|</li>
+            <li
+                role="button"
+                :class="{ active_link: region === 'TW' }"
+                class="fs-5"
+                @click="changeRegion('TW')">
+                TaiWan
+            </li>
+            <li>|</li>
+            <li
+                role="button"
+                :class="{ active_link: region === 'HK' }"
+                class="fs-5"
+                @click="changeRegion('HK')">
+                HongKong
             </li>
         </ul>
         <hr />

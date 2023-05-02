@@ -1,5 +1,4 @@
 <template>
-    <!-- <nav class="col-md-2 d-none d-lg-block"> -->
     <div
         class="d-none d-sm-flex flex-column justify-content-start align-items-center ms-2">
         <div id="logo" class="my-3" style="width: 30%">
@@ -44,7 +43,6 @@
             </div>
         </div>
     </div>
-    <!-- nav for md -->
     <nav class="navbar navbar-dark bg-dark fixed-top d-sm-none">
         <div class="container-fluid">
             <div
@@ -67,7 +65,8 @@
                 class="offcanvas offcanvas-end text-bg-dark"
                 tabindex="-1"
                 id="offcanvasDarkNavbar"
-                aria-labelledby="offcanvasDarkNavbarLabel">
+                aria-labelledby="offcanvasDarkNavbarLabel"
+                style="width: 70vw !important">
                 <div class="offcanvas-header">
                     <h5
                         class="offcanvas-title"

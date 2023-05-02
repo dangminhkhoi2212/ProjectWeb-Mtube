@@ -14,7 +14,7 @@ class apiYoutube {
             publishedAt: moment(data.snippet.publishedAt)
                 .utc()
                 .format('MM/DD/YYYY'),
-            region: 'CN',
+            region: 'RU',
         };
         return video;
     }
@@ -28,7 +28,7 @@ class apiYoutube {
                     part: ['snippet', 'statistics'],
                     chart: 'mostPopular',
                     maxResults: 45,
-                    regionCode: 'CN',
+                    regionCode: 'RU',
                 }),
         )
             .then((res) => res.json())

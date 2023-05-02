@@ -31,7 +31,6 @@
                 </i>
             </div>
         </div>
-        <!-- <hr v-show="this.inputSearch || this.myVideos" /> -->
         <div class="container-fluid row row-cols-md-3 pt-3">
             <div
                 class="card bg-transparent border-0"
@@ -206,21 +205,41 @@ export default {
     async mounted() {
         await this.getAllVideos();
         if (this.$route.name === 'home') {
-            if (this.region === 'VN')
+            if (this.region === 'KR')
                 this.videosShow = this.videos.filter(
-                    (video) => video.region === 'VN',
+                    (video) => video.region === 'KR',
                 );
             else if (this.region === 'US')
                 this.videosShow = this.videos.filter(
                     (video) => video.region === 'US',
                 );
+            else if (this.region === 'FR')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'FR',
+                );
+            else if (this.region === 'RU')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'RU',
+                );
             else if (this.region === 'JP')
                 this.videosShow = this.videos.filter(
                     (video) => video.region === 'JP',
                 );
+            else if (this.region === 'TH')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'TH',
+                );
+            else if (this.region === 'TW')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'TW',
+                );
+            else if (this.region === 'HK')
+                this.videosShow = this.videos.filter(
+                    (video) => video.region === 'HK',
+                );
             else
                 this.videosShow = this.videos.filter(
-                    (video) => video.region === 'KR',
+                    (video) => video.region === 'VN',
                 );
         } else this.videosShow = this.videos;
         this.isLoading = false;
