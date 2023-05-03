@@ -148,7 +148,6 @@ export default {
             var flag = true;
 
             try {
-                // const url_local = 'https://minhkhoi.cyclic.app/account';
                 const url_local = 'http://localhost:3000/account';
 
                 const accountExist = JSON.parse(

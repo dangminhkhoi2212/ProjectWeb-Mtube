@@ -51,7 +51,6 @@ export const useAccountStore = defineStore('account', {
                     }
                 });
         },
-
         async refresh() {
             await this.getAccount();
         },

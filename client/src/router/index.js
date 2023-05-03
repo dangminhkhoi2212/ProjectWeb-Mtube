@@ -15,7 +15,6 @@ const routes = [
     },
     {
         path: '/user',
-        // component: () => import('@/views/EditProfile.vue'),
         children: [
             {
                 path: 'login',
