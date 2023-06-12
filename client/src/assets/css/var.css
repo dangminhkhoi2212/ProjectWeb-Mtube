@@ -1,18 +1,25 @@
-:root{
+:root {
+    --width_header: 70px;
     --violet_100: #170f23;
-    --violet_90:#221a2d;
+    --violet_90: #221a2d;
     --violet_80: #221a2d;
-    --btn:#3c1568;
+    --btn: #4e2a7d;
     --btn_send: #af6ae9;
-    --scrollbar:#05767a;
-    --text:#fff;
-    --message:#16ca1c;
-    --bg_input:#c6bcd3;
-    --input_focus:#d9b3f7;
-    --bg_title:#48385c;
-    --btn_hover:#855ab5;
-    --text_title:#d24dd2;
-    --bg_card_infor:#3c1568;
-    --border:#7F669D;
-    
+    --btn_hover: #5f347f74;
+    --btn_acctive: #886fa374;
+    --scrollbar: #05767a;
+    --text: #fff;
+    --text_title: #d24dd2;
+    --text_black: #333333;
+    --text_white_50: #ffffffc6;
+    --message: #16ca1c;
+    --bg_input: #000000;
+    --bg_input_focus: #632692;
+    --bg_title: #48385c;
+    --bg_card_infor: #3c1568;
+    --bg_form: #918c8c33;
+    --bg_detail_video: #4e2a7d53;
+    --border: #7f669d;
+    --link_hover: #af6ae9;
+    --space_cover: #00000073;
 }

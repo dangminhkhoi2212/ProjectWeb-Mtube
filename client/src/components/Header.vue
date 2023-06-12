@@ -1,12 +1,18 @@
 <template>
-    <div class="d-none d-sm-block">
+    <div
+        class="d-none d-sm-block"
+        :class="this.$route.name === 'detail' ? 'fixed-top' : 'sticky-top'"
+        style="min-height: 70px">
         <div
-            class="row justify-content-center sticky-top myborder"
+            class="row justify-content-center align-items-center myborder"
             style="background-color: var(--violet_100)">
-            <div class="container-fluid my-3 col-5">
-                <div class="d-flex">
+            <div class="col-2 ms-3">
+                <navigation-mobile></navigation-mobile>
+            </div>
+            <div class="container-fluid my-3 col-5 d-flex">
+                <div class="d-flex col-8">
                     <input
-                        class="form-control me-2"
+                        class="form-control me-2 border border-0 text-white"
                         type="search"
                         placeholder="Search"
                         aria-label="Search"
@@ -37,7 +43,7 @@
                                     border-radius: 50%;
                                     object-fit: cover;
                                 "
-                                :src="this.accountStore.account.image"
+                                :src="this.accountStore.account.avatar.url"
                                 alt="" />
                         </li>
                     </router-link>
@@ -50,9 +56,7 @@
                         aria-expanded="true">
                         <span class="d-none d-lg-inline m-0">My Account</span>
                     </button>
-                    <ul
-                        class="dropdown-menu"
-                        style="box-shadow: 0 0 20px 10px var(--border)">
+                    <ul class="dropdown-menu">
                         <router-link :to="{ name: 'editprofile' }"
                             ><li
                                 class="dropdown-item"
@@ -78,7 +82,7 @@
 <script>
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
-
+import NavigationMobile from './NavigationMobile.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -90,7 +94,7 @@ export default {
             inputSearch: null,
         };
     },
-    components: {},
+    components: { NavigationMobile },
     methods: {
         removeAccount() {
             this.accountStore.account = {};
@@ -106,6 +110,7 @@ export default {
                     },
                 });
             }
+            this.inputSearch = '';
         },
     },
     mounted() {},

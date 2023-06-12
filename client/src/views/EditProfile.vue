@@ -56,15 +56,13 @@
                             type="password"
                             name="password"
                             value="super-secret"
-                            label="Password"
-                            help="Enter a new password"
+                            label="Enter a new password"
                             validation-visibility="live"
                             v-model="newpassword" />
                         <FormKit
                             type="password"
                             name="password_confirm"
-                            label="Confirm password"
-                            help="Confirm your new password"
+                            label="Confirm your new password"
                             validation="confirm"
                             validation-visibility="live"
                             validation-label="Password confirmation" />
@@ -80,9 +78,15 @@
                                 >Change Avatar</label
                             >
                         </div>
-                        <input
+                        <FormKit
                             v-if="changeAvtar"
+                            name="image"
                             type="file"
+                            label="Select a video as you would like"
+                            accept=".jpg,.png"
+                            multiple="false"
+                            validation-visibility="live"
+                            validation="required"
                             @change="onFileSelected" />
                     </div>
 
@@ -109,7 +113,6 @@
     </div>
 </template>
 <script>
-import axios from 'axios';
 import FormData from 'form-data';
 import Navigation from '../components/Navigation.vue';
 import accountService from '../services/account.service';
@@ -131,8 +134,8 @@ export default {
             newpassword: '',
             changeAvtar: false,
             changePassword: false,
-            urlImage: this.accountStore.account.image,
-            isLoading: true,
+            urlImage: this.accountStore.account.avatar.url,
+            isLoading: false,
             fullPage: true,
             onCancel: false,
         };
@@ -153,41 +156,43 @@ export default {
             form.append('name', this.account.name);
             form.append('username', this.account.username);
             form.append('email', this.account.email);
-            if (this.changePassword) form.append('password', this.newpassword);
-            if (this.changeAvtar) form.append('image', this.newimage);
+            if (this.changePassword && this.newpassword)
+                form.append('password', this.newpassword);
+            if (this.changeAvtar && this.newimage)
+                form.append('avatar', this.newimage);
 
             return form;
         },
         async updateAccount() {
             var form = this.newAccount();
-            const url_local = 'http://localhost:3000';
 
             try {
                 this.isLoading = true;
                 this.fullPage = true;
-                await axios.put(
-                    `${url_local}/account/${this.account._id}`,
+                await accountService.update(
+                    this.account._id,
                     form,
+                    this.account.token,
                 );
-                await this.accountStore.refresh();
+                await this.accountStore.getAccount();
 
+                this.changePassword = false;
+                this.changeAvtar = false;
                 this.isLoading = false;
+                URL.revokeObjectURL(this.urlImage);
 
                 this.extraStore.myAlert('success', ' Updated successfully 🥳');
-            } catch (err) {
+            } catch (error) {
                 this.isLoading = false;
+                console.log(error);
                 this.extraStore.myAlert(
                     'error',
-                    'An error has occurred!\nTry again. 😭',
+                    error.response.data.message || error.response.data,
                 );
             }
         },
     },
-    async mounted() {
-        this.isLoading = false;
-
-        this.fullPage = false;
-    },
+    async mounted() {},
 };
 </script>
 <style scoped>

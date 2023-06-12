@@ -1,11 +1,11 @@
 import axios from 'axios';
+import pinia from '../store/defineStore';
+import { useAccountStore } from '../store/account';
+
 const commonConfig = {
-    // headers: {
-    //     'Content-Type': 'application/json',
-    //     Accept: 'application/json',
-    // },
     headers: {
-        'Content-Type': undefined,
+        // 'Content-Type': 'multipart/form-data',
+        // Authorization: `Bearer ${accountStore.account.token}`,
     },
 };
 export default (baseURL) => {

@@ -1,9 +1,6 @@
 <template>
-    <section>
-        <VideoCard
-            :inputSearch="null"
-            :key="myVideos"
-            :myVideos="true"></VideoCard>
+    <section id="main" class="overflow-y">
+        <VideoCard class="px-lg-5" :inputSearch="null"></VideoCard>
     </section>
 </template>
 <script>

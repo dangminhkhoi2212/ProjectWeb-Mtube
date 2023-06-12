@@ -1,7 +1,8 @@
 <template>
-    <div class="page row vh-100 vw-100">
+    <div class="page vh-100 vw-100">
         <div
-            class="main col-sm-12 d-flex justify-content-center align-items-center">
+            id="main"
+            class="w-100 h-100 d-flex justify-content-center align-items-center">
             <div
                 class="rounded-4 my-sm-5 p-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xxl-4 vh-90 overflow-auto"
                 style="backdrop-filter: blur(50px)">
@@ -56,6 +57,7 @@ import Navigation from '../components/Navigation.vue';
 import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
+import alertUtil from '../utils/myAlert';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -81,10 +83,7 @@ export default {
                     this.password,
                 );
                 if (!this.account || Object.keys(this.account).length === 0) {
-                    this.extraStore.myAlert(
-                        'error',
-                        "Don't find your account!",
-                    );
+                    alertUtil.myAlert('error', "Don't find your account!");
                     return;
                 }
                 localStorage.removeItem('id');
@@ -92,7 +91,7 @@ export default {
                 await this.accountStore.getAccount();
                 this.$router.push({ name: 'home' });
             } catch (err) {
-                console.log(err);
+                alertUtil.myAlert('error', err.response.data.message);
             }
         },
     },
@@ -109,8 +108,7 @@ export default {
     background-color: var(--btn);
     color: var(--text);
 }
-.main {
+#main {
     background-image: url('../assets/images/bg_account_edit.jpg') !important;
-    background-repeat: no-repeat;
 }
 </style>

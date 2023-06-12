@@ -10,9 +10,7 @@ export const useAccountStore = defineStore('account', {
             this.account = {};
             if (!id) return;
             try {
-                this.account = JSON.parse(
-                    JSON.stringify(await accountService.get(id)),
-                );
+                this.account = await accountService.get(id);
             } catch (err) {
                 console.log(err);
             }
@@ -50,9 +48,6 @@ export const useAccountStore = defineStore('account', {
                         return;
                     }
                 });
-        },
-        async refresh() {
-            await this.getAccount();
         },
     },
 });

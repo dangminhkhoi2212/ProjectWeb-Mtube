@@ -4,13 +4,14 @@ const app = express();
 const accountRouter = require('./app/router/account.router');
 const videoRouter = require('./app/router/video.router');
 const commentRouter = require('./app/router/comment.router');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const path = require('path');
+
 app.use('/account', accountRouter);
 app.use('/video', videoRouter);
 app.use('/comment', commentRouter);

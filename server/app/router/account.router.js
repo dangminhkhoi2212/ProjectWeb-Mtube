@@ -3,23 +3,24 @@ const router = express.Router();
 const accountController = require('../controllers/account.controller');
 const Account = require('../models/Account.model');
 const ApiError = require('../api.error');
-const uploadCloud = require('../config/cloudinary.config');
+const multer = require('../lib/multerConfig');
+const cloudinary = require('../lib/cloudinary');
+const verifyToken = require('../middleware/account.middleware');
 
 router
     .route('/myVideos/:id/:videoId')
-    .put(accountController.addVideo)
+    .put(accountController.addFavoriteVideo)
     .delete(accountController.removeVideo);
 router.route('/myVideos/:id').delete(accountController.removeAllVideo);
 router
     .route('/:id')
     .get(accountController.findById)
-    .put(uploadCloud.single('image'), accountController.update)
+    .put(verifyToken, multer.single('avatar'), accountController.update)
     .delete(accountController.delete);
-
-router.route('/login').post(accountController.findOneAccount);
+router.route('/login').post(accountController.login);
 router
     .route('/')
     .get(accountController.findAll)
-    .post(uploadCloud.single('image'), accountController.create)
+    .post(multer.single('avatar'), accountController.create)
     .delete(accountController.deleteAll);
 module.exports = router;

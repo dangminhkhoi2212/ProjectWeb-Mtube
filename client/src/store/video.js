@@ -7,7 +7,7 @@ export const useVideoStore = defineStore('video', {
         inputSearch: '',
         videos: [],
         videosSearch: [],
-        myVideos: [],
+        favoriteVideos: [],
     }),
     getters: {},
     actions: {
@@ -33,12 +33,17 @@ export const useVideoStore = defineStore('video', {
         },
         checkInputSearch(video, input) {
             input = input.toLowerCase();
-            return (
-                video.tags.some((text) => text.toLowerCase().includes(input)) ||
-                video.title.toLowerCase().includes(input) ||
-                video.channelTitle.toLowerCase().includes(input) ||
-                video.videoId.toLowerCase().includes(input)
-            );
+            const checkTags =
+                video.tags &&
+                video.tags.some((text) => text.toLowerCase().includes(input));
+            const checkTitle =
+                video.title && video.title.toLowerCase().includes(input);
+            const checkChannelTitle =
+                video.channelTitle &&
+                video.channelTitle.toLowerCase().includes(input);
+            const checkVideoId =
+                video.videoId && video.videoId.toLowerCase().includes(input);
+            return checkTags || checkTitle || checkChannelTitle || checkVideoId;
         },
         async getVideosSearch() {
             try {
@@ -46,11 +51,11 @@ export const useVideoStore = defineStore('video', {
                     this.checkInputSearch(video, this.inputSearch),
                 );
             } catch (err) {
-                alert("Don't find video!");
+                console.log(err);
             }
             this.resetInputSearch();
         },
-        async getMyVideos() {
+        async getFavoriteVideos() {
             const accountStore = useAccountStore();
 
             const myAccount = JSON.parse(
@@ -58,11 +63,13 @@ export const useVideoStore = defineStore('video', {
                     await accountService.get(accountStore.account._id),
                 ),
             );
-            this.myVideos = myAccount.myVideos.map((video) => video);
+            this.favoriteVideos = myAccount.favoriteVideos.map(
+                (video) => video,
+            );
         },
         async refresh() {
             await this.getAllVideos();
-            await this.getMyVideos();
+            await this.getFavoriteVideos();
             await this.getVideosSearch();
         },
     },

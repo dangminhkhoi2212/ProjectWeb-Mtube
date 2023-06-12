@@ -1,7 +1,8 @@
 <template>
     <div class="page row vh-100 fixed-top">
         <div
-            class="main pt-lg-0 col-sm-12 d-flex justify-content-center align-items-center vh-100">
+            id="main"
+            class="pt-lg-0 col-sm-12 d-flex justify-content-center align-items-center vh-100">
             <div
                 class="rounded-4 p-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xxl-4 overflow-auto"
                 style="backdrop-filter: blur(50px); height: 90%">
@@ -40,8 +41,7 @@
                             type="password"
                             name="password"
                             value="super-secret"
-                            label="Password"
-                            help="Enter a new password"
+                            label="Enter a new password"
                             validation="required"
                             validation-visibility="live"
                             v-model="account.password" />
@@ -49,28 +49,29 @@
                             type="password"
                             name="password_confirm"
                             label="Confirm password"
-                            help="Confirm your new password"
                             validation="required|confirm"
                             validation-visibility="live"
                             validation-label="Password confirmation" />
-                        <div>
-                            <p>Avatar</p>
-                            <input
-                                type="file"
-                                @change="onFileSelected"
-                                required />
-                            <div class="d-flex justify-content-center">
-                                <img
-                                    v-if="urlImage"
-                                    :src="urlImage"
-                                    id="avatar"
-                                    class="m-3 rounded-4"
-                                    style="
-                                        width: 15rem;
-                                        height: 15rem;
-                                        object-fit: cover;
-                                    " />
-                            </div>
+                        <FormKit
+                            type="file"
+                            label="Select a avatar as you would like"
+                            accept=".jpg,.png"
+                            name="file"
+                            multiple="false"
+                            validation="required"
+                            @change="onFileSelected" />
+
+                        <div class="d-flex justify-content-center">
+                            <img
+                                v-if="urlImage"
+                                :src="urlImage"
+                                id="avatar"
+                                class="m-3 rounded-4"
+                                style="
+                                    width: 15rem;
+                                    height: 15rem;
+                                    object-fit: cover;
+                                " />
                         </div>
 
                         <button
@@ -100,6 +101,7 @@
                     v-model:active="isLoading"
                     :can-cancel="false"
                     loader="bars"
+                    backgroundColor="#170f23 !important"
                     :is-full-page="fullPage" />
             </div>
         </div>
@@ -148,10 +150,8 @@ export default {
             var flag = true;
 
             try {
-                const url_local = 'http://localhost:3000/account';
-
                 const accountExist = JSON.parse(
-                    JSON.stringify(await axios.get(url_local)),
+                    JSON.stringify(await accountService.getAll()),
                 );
                 for (let i = 0; i < accountExist.data.length; i++) {
                     if (accountExist.data[i].username === username) {
@@ -171,8 +171,6 @@ export default {
             return flag;
         },
         async register() {
-            const url_local = 'http://localhost:3000/account';
-
             this.isLoading = true;
 
             if (
@@ -190,18 +188,19 @@ export default {
             form.append('username', this.account.username);
             form.append('password', this.account.password);
             form.append('email', this.account.email);
-            form.append('image', this.account.image);
+            form.append('avatar', this.account.image);
             try {
-                await axios.post(url_local, form);
+                await accountService.create(form);
                 this.isLoading = false;
                 this.extraStore.myAlert('success', 'Create success! 🥳');
-
+                URL.revokeObjectURL(this.urlImage);
                 this.$router.push({ name: 'login' });
-            } catch (err) {
+            } catch (error) {
                 this.isLoading = false;
+                console.log(error);
                 this.extraStore.myAlert(
                     'error',
-                    'System crashed, wait a moment',
+                    error.response.data.message || error.message,
                 );
             }
         },
@@ -219,7 +218,7 @@ export default {
     background-color: var(--btn);
     color: var(--text);
 }
-.main {
+#main {
     background-image: url('../assets/images/bg_account_edit.jpg') !important;
     background-repeat: no-repeat;
 }

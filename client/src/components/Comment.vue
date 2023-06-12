@@ -1,38 +1,73 @@
 <template>
-    <div class="h-100 p-0">
-        <div
-            class="py-1 text-center rounded-3 fs-5"
-            style="background-color: var(--bg_title); color: var(--text_title)">
-            Comment
-            <i class="fa-regular fa-comments"></i>
+    <div class="">
+        <p class="fs-5">{{ comments.length }} comments</p>
+        <div class="input-group my-4 pt-md-2">
+            <img
+                :src="commentOfUser.userImage"
+                alt=""
+                style="width: 48px; height: 48px; object-fit: cover"
+                class="rounded-5 col-1 mx-3" />
+            <input
+                type="text"
+                class="form-control fs-5 h-100"
+                placeholder="Add a comment..."
+                aria-label="Bình luận về video"
+                aria-describedby="button-addon2"
+                v-model="content"
+                @keyup.enter="addComment()" />
+            <button
+                class="rounded-1 h-100 text-center"
+                data-bs-toggle="modal"
+                type="button"
+                @click="addComment()">
+                <i class="fa-solid fa-paper-plane p-2"></i>
+            </button>
         </div>
         <div
             id="comment"
             class="container-fluid overflow-auto m-0 p-0 vl-parent"
-            style="height: 75vh; overflow-x: hidden !important">
-            <div v-for="(cmt, index) in comments" :key="index" class="">
-                <div class="d-flex gap-2 my-2 justify-content-start">
-                    <img
-                        style="width: 48px; height: 48px"
-                        :src="cmt.userImage"
-                        class="rounded"
-                        alt="..."
-                        referrerpolicy="no-referrer" />
-                    <p class="fs-5">{{ cmt.userName }}</p>
+            style="overflow-x: hidden !important">
+            <div
+                v-for="(cmt, index) in comments"
+                :key="index"
+                class="row align-items-center">
+                <div class="col-11">
+                    <div class="">
+                        <router-link
+                            :to="{
+                                name: 'profile',
+                                params: { accountId: cmt.userId },
+                            }"
+                            class="d-flex gap-2 my-2 justify-content-start">
+                            <img
+                                style="
+                                    width: 48px;
+                                    height: 48px;
+                                    object-fit: cover;
+                                "
+                                :src="cmt.userImage"
+                                class="rounded-5"
+                                alt="..."
+                                referrerpolicy="no-referrer" />
+                            <p class="fs-5">{{ cmt.userName }}</p>
+                        </router-link>
+                    </div>
+                    <p
+                        class="text-break"
+                        style="white-space: pre-line"
+                        :key="index">
+                        {{ cmt.textOriginal }}
+                    </p>
+                    <p>{{ cmt.publishedAt }}</p>
                 </div>
-                <p
-                    class="text-break"
-                    style="white-space: pre-line"
-                    :key="index">
-                    {{ cmt.textOriginal }}
-                </p>
-                <p>{{ cmt.publishedAt }}</p>
                 <button
-                    class="rounded-2"
+                    class="rounded-2 col-2 p-0"
                     @click="deleteComment(cmt)"
-                    v-show="cmt.userId === this.accountStore.account._id"
-                    style="">
-                    Delete
+                    v-show="
+                        cmt.userId === this.accountStore.account._id || admin
+                    "
+                    style="height: 30px; width: 40px">
+                    <i class="fa-solid fa-trash-can"></i>
                 </button>
                 <hr />
             </div>
@@ -44,23 +79,6 @@
                 :opacity="0.8"
                 loader="bars"
                 :is-full-page="fullPage" />
-        </div>
-        <div class="input-group mb-2 pt-md-2">
-            <input
-                type="text"
-                class="form-control fs-5 h-100"
-                placeholder="Bình luận về video"
-                aria-label="Bình luận về video"
-                aria-describedby="button-addon2"
-                v-model="content"
-                @keyup.enter="addComment()" />
-            <button
-                class="btn btn-outline-secondary"
-                data-bs-toggle="modal"
-                type="button"
-                @click="addComment()">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
         </div>
     </div>
 </template>
@@ -82,6 +100,7 @@ export default {
     },
     props: {
         videoId: { type: String },
+        admin: false,
     },
     components: { Loading },
     data() {
@@ -94,7 +113,7 @@ export default {
                 videoId: this.videoId,
                 userId: this.accountStore.account._id,
                 userName: this.accountStore.account.name,
-                userImage: this.accountStore.account.image,
+                userImage: this.accountStore.account.avatar.url,
                 textOriginal: new String(),
                 publishedAt: site.getToDay(),
             },
@@ -166,7 +185,7 @@ export default {
             }
         },
         keepScroll() {
-            var comment = document.querySelector('#comment');
+            var comment = document.querySelector('#main');
             comment.scrollTop = comment.scrollHeight;
         },
     },
@@ -201,5 +220,8 @@ export default {
 button:hover {
     background-color: var(--btn);
     color: var(--text);
+}
+::-webkit-scrollbar {
+    display: none;
 }
 </style>

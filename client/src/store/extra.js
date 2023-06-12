@@ -3,10 +3,15 @@ import Swal from 'sweetalert2';
 
 export const useExtraStore = defineStore('extra', {
     state: () => {
-        return {};
+        return {
+            isDetailPage: Boolean,
+        };
     },
     getters: {},
     actions: {
+        setDetailPage(bool) {
+            this.isDetailPage = bool;
+        },
         myAlert(icon, title) {
             Swal.fire({
                 position: 'top',

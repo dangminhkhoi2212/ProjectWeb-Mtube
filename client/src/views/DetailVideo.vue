@@ -1,29 +1,40 @@
 <template>
-    <div class="row mt-5 mt-md-0 text-break vl-parent">
-        <div class="col-sm-8 overflow-auto" style="height: 88vh">
-            <div id="video" class="mt-5 mt-sm-0">
-                <iframe
-                    class="mt-3 mt-sm-0"
-                    width="100%"
-                    height="100%"
-                    :src="urlVideo"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
-            </div>
-
-            <div class="mx-1">
-                <p class="p-3 fs-2">
+    <div class="row mt-5 mt-md-0 text-break vl-parent px-lg-5">
+        <div class="col-12 col-xl-8">
+            <!-- <VideoController
+                id="video"
+                class="mt-5 mt-sm-0 w-100"
+                style=""
+                :src="urlVideo"
+                :autoplay="false"
+                :controls="true"></VideoController> -->
+            <Artplayer v-if="urlVideo" :option="option" :style="style" />
+            <div class="">
+                <p class="p-0 fs-4">
                     {{ video.title }}
                 </p>
                 <hr />
                 <div class="">
                     <p class="fs-3">
-                        <i
-                            class="fa-solid fa-house-fire"
-                            style="color: var(--text_title)"></i
-                        >&nbsp;
-                        {{ video.channelTitle }}
+                        <RouterLink
+                            v-if="video.accountId"
+                            :to="{
+                                name: 'profile',
+                                params: {
+                                    accountId: video.accountId,
+                                },
+                            }">
+                            <img
+                                :src="avatarChannel"
+                                alt=""
+                                style="
+                                    width: 48px;
+                                    height: 48px;
+                                    object-fit: cover;
+                                "
+                                class="rounded-5 col-1 mx-3" />&nbsp;
+                            {{ video.channelTitle }}</RouterLink
+                        >
                     </p>
 
                     <div
@@ -48,32 +59,58 @@
                             >&nbsp; <span>Favorite</span>
                         </div>
                     </div>
-                    <button
-                        class="col-12 mb-2 text-center rounded-3 fs-5"
-                        style="
-                            background-color: var(--bg_title);
-                            color: var(--text_title);
-                        "
-                        @click="detail = !detail">
-                        <span class="me-2">Description</span>
-                        <i v-if="detail" class="fa-solid fa-caret-up"></i>
-                        <i v-else class="fa-solid fa-caret-down"></i>
-                    </button>
-                    <div v-if="detail">
-                        <p class="">
-                            <i class="fa-solid fa-calendar-days"></i>&nbsp;
-                            {{ video.publishedAt }}
-                        </p>
-                        <p style="white-space: pre-line">
-                            {{ video.description }}
-                        </p>
+                    <div class="row justify-content-center">
+                        <button
+                            class="col-5 p-2 mb-2 text-center rounded-3 fs-5"
+                            style="
+                                background-color: var(--btn);
+                                color: var(--text_title);
+                            "
+                            @click="isShow = !isShow">
+                            <span v-if="isShow">
+                                <span class="me-2">Show less</span>
+                                <i class="fa-solid fa-caret-up"></i>
+                            </span>
+                            <span v-else>
+                                <span class="me-2">Show more</span>
+                                <i class="fa-solid fa-caret-down"></i>
+                            </span>
+                        </button>
+                        <div
+                            v-if="isShow"
+                            class="rounded-2 p-3"
+                            style="background-color: var(--bg_detail_video)">
+                            <p class="">
+                                <i class="fa-solid fa-calendar-days"></i>&nbsp;
+                                {{ video.publishedAt }}
+                            </p>
+                            <p
+                                v-if="
+                                    video.description &&
+                                    video.description !== 'undefined'
+                                "
+                                style="white-space: pre-line">
+                                {{ video.description }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- add :key to refresh component -->
+            <div class="col-sm-12 my-4">
+                <Comment
+                    :key="video._id"
+                    :videoId="video._id"
+                    :admin="
+                        video.accountId === this.accountStore.account._id
+                    "></Comment>
+            </div>
         </div>
-        <!-- add :key to refresh component -->
-        <div class="col-sm-4">
-            <Comment :key="video.videoId" :videoId="video.videoId"></Comment>
+        <div class="col-12 col-xl-4">
+            <VideoCard
+                :category="video.category"
+                :key="video._id"
+                :videoIdCurrent="video._id"></VideoCard>
         </div>
         <loading
             v-model:active="isLoading"
@@ -87,6 +124,7 @@
 </template>
 <script>
 import videoService from '../services/video.service';
+import accountService from '../services/account.service';
 import Navigation from '../components/Navigation.vue';
 import Comment from '../components/Comment.vue';
 import Header from '../components/Header.vue';
@@ -95,7 +133,10 @@ import { useVideoStore } from '../store/video';
 import { useExtraStore } from '../store/extra';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
-
+import VideoCard from '../components/VideoCard.vue';
+import VideoRelate from '../components/VideoRelate.vue';
+import VideoController from '../components/VideoController.vue';
+import Artplayer from '../components/Artplayer.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -108,6 +149,10 @@ export default {
         Header,
         Comment,
         Loading,
+        VideoCard,
+        VideoRelate,
+        VideoController,
+        Artplayer,
     },
     props: {
         id: {
@@ -117,15 +162,38 @@ export default {
     },
     data() {
         return {
-            video: {
-                type: Object,
-            },
+            video: {},
             urlVideo: '',
             liked: false,
             isLoading: true,
             fullPage: false,
             onCancel: false,
-            detail: false,
+            isShow: false,
+            avatarChannel: '',
+            option: {
+                autoplay: true,
+                pip: true,
+                screenshot: true,
+                setting: true,
+                loop: false,
+                flip: true,
+                playbackRate: true,
+                aspectRatio: true,
+                fullscreen: true,
+                fullscreenWeb: true,
+                subtitleOffset: true,
+                miniProgressBar: true,
+                mutex: true,
+                backdrop: true,
+                playsInline: true,
+                autoPlayback: true,
+                airplay: true,
+                theme: '#4e2a7d',
+            },
+            style: {
+                width: '100%',
+                height: '480px',
+            },
         };
     },
     methods: {
@@ -133,7 +201,8 @@ export default {
             try {
                 this.video = await videoService.get(id);
                 this.format;
-                this.urlVideo = `https://www.youtube-nocookie.com/embed/${this.video.videoId}`;
+                this.urlVideo = this.video.videoUpload.url;
+                this.option.url = this.urlVideo;
                 for (let i = 0; i < this.video.usersLike.length; i++) {
                     if (
                         JSON.parse(JSON.stringify(this.video.usersLike[i])) ===
@@ -176,6 +245,10 @@ export default {
                 );
             await this.getVideo(this.id);
         },
+        async getAvatarChannel(id) {
+            const data = await accountService.get(id);
+            this.avatarChannel = data.avatar.url;
+        },
     },
     computed: {
         format() {
@@ -185,8 +258,9 @@ export default {
     },
     async mounted() {
         await this.getVideo(this.id);
+        await this.getAvatarChannel(this.video.accountId);
         await videoService.addView(this.video._id);
-        await this.getVideo(this.id);
+
         this.isLoading = false;
     },
 };

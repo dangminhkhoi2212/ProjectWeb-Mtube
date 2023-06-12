@@ -3,6 +3,7 @@ const CommentModel = require('../models/Comment.model');
 const ApiError = require('../api.error');
 const videoApiYoutube = require('../services/videoApiYoutube');
 const commentApiYoutobe = require('../services/commentApiYoutube');
+const cloudinary = require('../lib/cloudinary');
 class Methods {
     async findAll(req, res, next) {
         await VideoModel.find({})
@@ -20,19 +21,31 @@ class Methods {
     }
     async create(req, res, next) {
         var data = req.body;
-        if (!data.name.trim()) {
-            return next(new ApiError(400, 'Name can not be empty'));
-        }
-        await VideoModel.create(data)
-            .then((data) => res.send(data))
-            .catch((error) => {
-                return next(
-                    new ApiError(
-                        500,
-                        'An error occurred while creating the music video',
-                    ),
-                );
-            });
+        var file = req.file;
+        data.videoUpload = {};
+        cloudinary.uploader.upload(
+            file.path,
+            {
+                resource_type: 'video',
+                folder: `upload_videos/${data.accountId}`,
+            },
+            async (err, result) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                // return res.send(result);
+                data.videoUpload.public_id = result.public_id;
+                data.videoUpload.url = result.url;
+                await VideoModel.create(data)
+                    .then((data) => res.send(data))
+                    .catch((error) => {
+                        return next(
+                            new ApiError(error.code || 500, error.message),
+                        );
+                    });
+            },
+        );
     }
     async createWithApi(req, res, next) {
         //*********** Create data with apiYoutube ********
@@ -84,7 +97,7 @@ class Methods {
             newVideoUpdate.viewCount++;
             await newVideoUpdate.save().then((result) => res.send(result));
         } catch (err) {
-            next(new ApiError('500', 'Dont add userlike'));
+            next(new ApiError(err.code || 500, err.message));
         }
     }
     async delete(req, res, next) {
@@ -93,7 +106,7 @@ class Methods {
             await CommentModel.deleteMany({ videoId: req.params.videoId });
             res.send(`Delete ${req.params.videoId} success`);
         } catch (error) {
-            next(new ApiError(404, 'Video not found'));
+            next(new ApiError(err.code || 500, err));
         }
     }
     async searchVideo(req, res, next) {
@@ -125,7 +138,7 @@ class Methods {
             }
             await newVideoUpdate.save().then((result) => res.send(result));
         } catch (err) {
-            next(new ApiError('500', 'Dont add userlike'));
+            next(new ApiError(err.code || 500, err));
         }
     }
     async removeUserLike(req, res, next) {

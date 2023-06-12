@@ -27,8 +27,11 @@ class AccountService {
             })
         ).data;
     }
-    async update(id, data) {
-        return (await this.api.put(`/${id}`, data)).data;
+    async update(id, data, token) {
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        return (await this.api.put(`/${id}`, data, config)).data;
     }
     async delete(id) {
         return (await this.api.delete(`/${id}`)).data;

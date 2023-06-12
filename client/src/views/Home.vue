@@ -1,91 +1,17 @@
 <template>
     <section id="main">
-        <ul
-            class="px-4 d-flex gap-3 mt-5 mt-sm-0 pt-3 pt-sm-0 overflow-auto vw-100"
-            style="white-space: nowrap; width: 100vw">
-            <li
-                role="button"
-                :class="{ active_link: region === 'VN' }"
-                class="fs-5"
-                @click="changeRegion('VN')">
-                VietNam
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'US' }"
-                class="fs-5"
-                @click="changeRegion('US')">
-                United Kingdom
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'FR' }"
-                class="fs-5"
-                @click="changeRegion('FR')">
-                France
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'RU' }"
-                class="fs-5"
-                @click="changeRegion('RU')">
-                Russia
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'JP' }"
-                class="fs-5"
-                @click="changeRegion('JP')">
-                Japan
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'KR' }"
-                class="fs-5"
-                @click="changeRegion('KR')">
-                Korea
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'TH' }"
-                class="fs-5"
-                @click="changeRegion('TH')">
-                ThaiLand
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'TW' }"
-                class="fs-5"
-                @click="changeRegion('TW')">
-                TaiWan
-            </li>
-            <li>|</li>
-            <li
-                role="button"
-                :class="{ active_link: region === 'HK' }"
-                class="fs-5"
-                @click="changeRegion('HK')">
-                HongKong
-            </li>
-        </ul>
-        <hr />
+        <Carousel v-model="categoryActive"></Carousel>
         <VideoCard
             :inputSearch="null"
-            :key="region"
-            :region="region"></VideoCard>
+            :key="categoryActive"
+            :category="categoryActive"></VideoCard>
     </section>
 </template>
 <script>
 import VideoCard from '../components/VideoCard.vue';
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
+import Carousel from '../components/Carousel.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -94,31 +20,51 @@ export default {
     },
     components: {
         VideoCard,
+        Carousel,
     },
+
     data() {
-        return {
-            region: 'VN',
-        };
+        return { categoryActive: 'All' };
     },
-    methods: {
-        changeRegion(region) {
-            this.region = region;
-        },
-    },
+    methods: {},
     computed: {},
-    async mounted() {},
+    mounted() {
+        console.log(this.categoryActive);
+    },
 };
 </script>
 <style scoped>
 .active_link {
-    border-radius: 2rem;
-    border-bottom: 2px solid var(--border);
-    transition: all 0.2s linear;
+    background-color: var(--btn);
+}
+
+ul li {
+    padding: 0.3rem 0.6rem;
+    background-color: var(--btn_hover);
 }
 ul li:hover {
-    border-bottom: 2px solid var(--border);
+    background-color: var(--btn);
 }
+ul {
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
 ul::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+}
+
+ul::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+ul::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+ul::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
 }
 </style>

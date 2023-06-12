@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="vl-parent">
+    <div id="app">
         <loading
             v-model:active="isLoading"
             :can-cancel="false"
@@ -9,14 +9,24 @@
             loader="bars"
             :is-full-page="fullPage" />
         <div
-            class="page row fixed-top vh-100"
+            v-if="this.$route.name !== 'detail'"
+            class="page row fixed-top vh-100 vl-parent position-relative"
             style="overflow-x: hidden; overflow-y: auto">
-            <nav class="col-sm-2" v-if="accountStore.checkAccount()">
-                <Navigation></Navigation>
-            </nav>
-            <div id="main" class="col-sm-10 p-0">
+            <Navigation
+                class="d-none d-sm-flex col-sm-2"
+                v-if="accountStore.checkAccount()"></Navigation>
+            <div id="main" class="col-sm-10 p-0" style="overflow-y: auto">
                 <Header v-if="accountStore.checkAccount()"></Header>
-                <router-view />
+                <router-view :key="this.$route" />
+            </div>
+        </div>
+        <div
+            class="page row fixed-top vh-100 vl-parent"
+            style="overflow-x: hidden; overflow-y: auto"
+            v-if="this.$route.name === 'detail'">
+            <div id="main" class="col-sm-12 p-0" style="margin-top: 69px">
+                <Header v-if="accountStore.checkAccount()"></Header>
+                <router-view :key="this.$route" />
             </div>
         </div>
     </div>
@@ -49,7 +59,8 @@ export default {
     },
     methods: {},
     async mounted() {
-        await this.accountStore.refresh();
+        if (this.accountStore.account === null)
+            await this.accountStore.getAccount();
         setTimeout(() => {
             this.isLoading = false;
         }, 500);

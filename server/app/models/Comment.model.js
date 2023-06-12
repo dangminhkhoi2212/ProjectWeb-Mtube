@@ -5,12 +5,12 @@ const siteService = require('../services/site');
 
 const CommentSchame = new Schema(
     {
-        videoId: { type: String, require: true },
-        userId: { type: String, require: true },
-        userName: { type: String, require: true },
-        userImage: { type: String, require: true },
-        textOriginal: { type: String, require: true },
-        publishedAt: { type: String, require: true },
+        videoId: { type: String, required: true },
+        userId: { type: String, required: true },
+        userName: { type: String, required: true },
+        userImage: { type: String, required: true },
+        textOriginal: { type: String, required: true },
+        publishedAt: { type: String, required: true },
     },
     {
         versionKey: false,

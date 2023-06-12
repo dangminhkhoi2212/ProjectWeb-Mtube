@@ -1,8 +1,10 @@
 <template>
     <section id="main">
-        <VideoCard
-            :key="this.$route.params.textSearch"
-            :inputSearch="this.$route.params.textSearch"></VideoCard>
+        <div class="px-5">
+            <VideoCard
+                :key="this.$route.params.textSearch"
+                :inputSearch="this.$route.params.textSearch"></VideoCard>
+        </div>
     </section>
 </template>
 <script>

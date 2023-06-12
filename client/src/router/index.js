@@ -22,9 +22,9 @@ const routes = [
                 component: () => import('@/views/Login.vue'),
             },
             {
-                path: 'myvideos',
-                name: 'myvideos',
-                component: () => import('@/views/MyVideos.vue'),
+                path: 'favorite',
+                name: 'favorite',
+                component: () => import('@/views/FavoriteVideo.vue'),
             },
             {
                 path: 'register',
@@ -35,6 +35,11 @@ const routes = [
                 path: 'editprofile',
                 name: 'editprofile',
                 component: () => import('@/views/EditProfile.vue'),
+            },
+            {
+                path: 'uploadVideo',
+                name: 'uploadVideo',
+                component: () => import('@/views/UploadVideo.vue'),
             },
         ],
     },
@@ -48,6 +53,12 @@ const routes = [
         path: '/search/:textSearch',
         name: 'search',
         component: () => import('@/views/Search.vue'),
+        props: true,
+    },
+    {
+        path: '/profile/:accountId',
+        name: 'profile',
+        component: () => import('@/views/Profile.vue'),
         props: true,
     },
     {

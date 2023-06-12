@@ -1,58 +1,47 @@
 <template>
-    <div
-        class="d-none d-sm-flex flex-column justify-content-start align-items-center ms-2">
-        <div id="logo" class="my-3" style="width: 30%">
+    <nav
+        class="d-flex flex-column justify-content-start text-center text-xl-start gap-4 gap-xl-3 z-5">
+        <div id="logo" class="my-3 mx-auto" style="width: 20%">
             <RouterLink :to="{ name: 'home' }" class="logo">
                 <img class="w-100" src="../assets/images/logo.png" alt="" />
             </RouterLink>
         </div>
-        <hr />
-        <div
-            class="d-flex flex-column justify-content-start text-center text-xl-start gap-4 gap-xl-3">
-            <RouterLink :to="{ name: 'home' }" class="p-2 p-xl-3">
-                <span class="text-white fs-5">
-                    <span class="me-xl-2">
-                        <i class="fa-brands fa-hotjar"></i>
-                    </span>
-                    <span class="d-none d-xl-inline">Trending</span>
+        <hr class="m-0 p-0" />
+        <RouterLink :to="{ name: 'home' }" class="p-2 p-xl-3">
+            <span class="text-white fs-5">
+                <span class="me-xl-2">
+                    <i class="fa-brands fa-hotjar"></i>
                 </span>
-            </RouterLink>
-            <RouterLink :to="{ name: 'myvideos' }" class="p-2 p-xl-3">
-                <span class="text-white fs-5">
-                    <span class="me-xl-2">
-                        <i class="fa-solid fa-clapperboard"></i>
-                    </span>
-                    <span class="d-none d-xl-inline">My Videos</span>
+                <span class="d-none d-xl-inline">Trending</span>
+            </span>
+        </RouterLink>
+        <RouterLink :to="{ name: 'favorite' }" class="p-2 p-xl-3">
+            <span class="text-white fs-5">
+                <span class="me-xl-2">
+                    <i class="fa-solid fa-clapperboard"></i>
                 </span>
-            </RouterLink>
-            <div class="commingup p-4 p-xl-3" @click="commingup">
-                <span class="text-white fs-5">
-                    <span class="me-xl-2">
-                        <i class="fa-solid fa-cloud-arrow-up fa-beat-fade"></i>
-                    </span>
-                    <span class="d-none d-xl-inline">Uploads</span>
+                <span class="d-none d-xl-inline">Favorite Videos</span>
+            </span>
+        </RouterLink>
+        <RouterLink :to="{ name: 'uploadVideo' }" class="p-2 p-xl-3">
+            <span class="text-white fs-5">
+                <span class="me-xl-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
                 </span>
-            </div>
-            <div class="commingup p-4 p-xl-3" @click="commingup">
-                <span class="text-white fs-5">
-                    <span class="me-xl-2">
-                        <i class="fa-solid fa-comment fa-beat-fade"></i>
-                    </span>
-                    <span class="d-none d-xl-inline">Chat</span>
+                <span class="d-none d-xl-inline">Upload Video</span>
+            </span>
+        </RouterLink>
+        <div class="commingup p-4 p-xl-3" @click="commingup">
+            <span class="text-white fs-5">
+                <span class="me-xl-2">
+                    <i class="fa-solid fa-comment fa-beat-fade"></i>
                 </span>
-            </div>
+                <span class="d-none d-xl-inline">Chat</span>
+            </span>
         </div>
-    </div>
-    <nav class="navbar navbar-dark bg-dark fixed-top d-sm-none">
+    </nav>
+    <!-- <nav class="navbar navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
-            <div
-                class="ms-4"
-                style="width: 2.5rem"
-                @click="this.extraStore.changeActive('Trending')">
-                <RouterLink :to="{ name: 'home' }" class="logo active_nav">
-                    <img class="w-100" src="../assets/images/logo.png" alt="" />
-                </RouterLink>
-            </div>
             <button
                 class="navbar-toggler"
                 type="button"
@@ -62,7 +51,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div
-                class="offcanvas offcanvas-end text-bg-dark"
+                class="offcanvas offcanvas-start text-bg-dark"
                 tabindex="-1"
                 id="offcanvasDarkNavbar"
                 aria-labelledby="offcanvasDarkNavbarLabel"
@@ -201,8 +190,17 @@
                     </ul>
                 </div>
             </div>
+            <div
+                class="ms-4"
+                style="width: 2.5rem"
+                @click="this.extraStore.changeActive('Trending')">
+                <RouterLink :to="{ name: 'home' }" class="logo active_nav">
+                    <img class="w-100" src="../assets/images/logo.png" alt="" />
+                </RouterLink>
+            </div>
         </div>
-    </nav>
+    </nav> -->
+    <!-- <MobileMenu></MobileMenu> -->
 </template>
 <script>
 import { useAccountStore } from '../store/account';
@@ -219,6 +217,7 @@ export default {
         return {
             inputSearch: '',
             account: this.accountStore.account,
+            isDetailPage: this.$route.name === 'detail',
         };
     },
     components: {},
@@ -255,6 +254,7 @@ export default {
             }
         },
     },
+    mounted() {},
 };
 </script>
 <style scoped>

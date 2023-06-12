@@ -1,5 +1,7 @@
 <template>
-    <div class="mt-5 mt-sm-0 vl-parent overflow-auto" style="height: 80vh">
+    <div
+        class="container mt-5 mt-sm-0 vl-parent overflow-auto w-100"
+        :style="isHomePage || isFavoriteVideo ? 'height:82vh' : ''">
         <div
             v-if="this.inputSearch"
             class="d-flex justify-content-between align-items-center py-2 sticky-top zindex-sticky"
@@ -14,7 +16,7 @@
             </h4>
         </div>
         <div
-            v-if="this.myVideos"
+            v-if="isFavoriteVideo"
             class="d-flex justify-content-between align-items-center py-2 sticky-top"
             style="
                 z-index: 1 !important;
@@ -31,9 +33,11 @@
                 </i>
             </div>
         </div>
-        <div class="container-fluid row row-cols-md-3 pt-3">
+        <div
+            class="row pt-3"
+            :class="isHomePage ? 'row-cols-md-3' : 'row-cols-1'">
             <div
-                class="card bg-transparent border-0"
+                class="row align-items-center"
                 v-for="(video, index) in videosShow"
                 :key="index">
                 <router-link
@@ -42,27 +46,85 @@
                         name: 'detail',
                         params: {
                             id: video._id,
+                            accountId: video.accountId,
                         },
-                    }">
-                    <img
-                        :src="video.image"
-                        class="card-img-top rounded-4"
-                        :alt="video.title" />
-                    <div class="card-body">
-                        <h5
-                            class="card-title fs-5 text-truncate"
-                            :alt="video.title">
-                            &nbsp;
+                    }"
+                    class="row col-11">
+                    <!-- <VideoController
+                        :src="video.videoUpload.url"
+                        class="card-video-top rounded-3 my-1"
+                        :class="isHomePage ? 'col-12' : 'col-5'"
+                        :alt="video.title"
+                        :style="
+                            isHomePage ||
+                            this.$route.name === 'search' ||
+                            this.$route.name === 'favorite'
+                                ? 'height: 12rem'
+                                : 'height:120px'
+                        " /> -->
+                    <Artplayer
+                        class="card-video-top rounded-3 my-1"
+                        :class="
+                            isHomePage ||
+                            this.$route.name === 'search' ||
+                            this.$route.name === 'favorite'
+                                ? 'col-12'
+                                : 'col-5'
+                        "
+                        :alt="video.title"
+                        v-if="video.videoUpload.url"
+                        :option="{ ...option, url: video.videoUpload.url }"
+                        :style="style" />
+                    <div class="col-7">
+                        <p
+                            class="my-1 w-100"
+                            style="
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                            ">
                             {{ video.title }}
-                        </h5>
-                        <p class="card-text fz-6">
-                            <i class="fa-solid fa-house-fire"></i>&nbsp;
-                            {{ video.channelTitle }}
                         </p>
+                        <div
+                            class="font-weight-lighter"
+                            style="
+                                color: var(--text_white_50);
+                                font-size: 0.8rem;
+                                font-weight: 300;
+                            ">
+                            <p class="p-0 m-0">
+                                <RouterLink
+                                    :to="{
+                                        name: 'profile',
+                                        params: {
+                                            accountId: video.accountId,
+                                        },
+                                    }">
+                                    {{ video.channelTitle }}
+                                </RouterLink>
+                            </p>
+                            <div class="row mt-auto">
+                                <p
+                                    class="p-0 m-0"
+                                    :class="
+                                        isFavoriteVideo ? 'col-3' : 'col-6'
+                                    ">
+                                    {{ video.viewCount + ' views' }}
+                                </p>
+                                <span class="p-0 m-0 col-1">•</span>
+                                <p class="p-0 m-0 col-5">
+                                    {{ video.publishedAt }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </router-link>
-                <div class="card-footer text-center pb-5 border-0">
-                    <div v-if="myVideos" class="fs-5">
+                <div
+                    v-if="isFavoriteVideo"
+                    class="text-center pb-5 border-0 col-1">
+                    <div class="fs-5">
                         <i
                             class="fa-solid fa-trash btn-reacte rounded-4"
                             @click="removeVideo(video._id)"></i>
@@ -91,6 +153,9 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import Swal from 'sweetalert2';
 import { useExtraStore } from '../store/extra';
+import VideoController from './VideoController.vue';
+import Artplayer from './Artplayer.vue';
+
 export default {
     setup() {
         const videoStore = useVideoStore();
@@ -100,11 +165,13 @@ export default {
     },
     props: {
         inputSearch: { type: String },
-        myVideos: Boolean,
-        region: { type: String },
+        category: { type: String },
+        videoIdCurrent: { type: String },
     },
     components: {
         Loading,
+        VideoController,
+        Artplayer,
     },
     data() {
         return {
@@ -114,15 +181,23 @@ export default {
             fullPage: false,
             onCancel: false,
             videosShow: [],
+            isFavoriteVideo: this.$route.name === 'favorite',
+            isHomePage: this.$route.name === 'home',
+            option: { showController: false },
+            style: {
+                width: '100%',
+                height: '180px',
+                borderRadius: '10px',
+            },
         };
     },
     methods: {
         async getAllVideos() {
             this.videoStore.updateInputSearch(this.inputSearch);
-            if (this.myVideos) {
-                //my videos
-                await this.videoStore.getMyVideos();
-                this.videos = this.videoStore.myVideos;
+            if (this.isFavoriteVideo) {
+                //favoriteVideos
+                await this.videoStore.getFavoriteVideos();
+                this.videos = this.videoStore.favoriteVideos;
             } else if (!this.inputSearch) {
                 // home
                 await this.videoStore.getAllVideos();
@@ -205,43 +280,22 @@ export default {
     async mounted() {
         await this.getAllVideos();
         if (this.$route.name === 'home') {
-            if (this.region === 'KR')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'KR',
-                );
-            else if (this.region === 'US')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'US',
-                );
-            else if (this.region === 'FR')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'FR',
-                );
-            else if (this.region === 'RU')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'RU',
-                );
-            else if (this.region === 'JP')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'JP',
-                );
-            else if (this.region === 'TH')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'TH',
-                );
-            else if (this.region === 'TW')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'TW',
-                );
-            else if (this.region === 'HK')
-                this.videosShow = this.videos.filter(
-                    (video) => video.region === 'HK',
-                );
+            if (this.category === 'All') this.videosShow = this.videos;
             else
                 this.videosShow = this.videos.filter(
-                    (video) => video.region === 'VN',
+                    (video) => video.category === this.category,
                 );
+        } else if (this.$route.name === 'detail') {
+            this.videosShow = this.videos.filter(
+                (video) =>
+                    video.category === this.category &&
+                    video._id !== this.videoIdCurrent,
+            );
         } else this.videosShow = this.videos;
+        console.log(
+            '🚀 ~ file: VideoCard.vue:289 ~ mounted ~ this.videosShow:',
+            this.videosShow,
+        );
         this.isLoading = false;
     },
 };
