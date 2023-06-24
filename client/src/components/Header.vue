@@ -1,22 +1,26 @@
 <template>
     <div
-        class="d-none d-sm-block"
-        :class="this.$route.name === 'detail' ? 'fixed-top' : 'sticky-top'"
+        class="d-sm-block"
+        :class="isDetailPage ? 'fixed-top' : 'sticky-top'"
         style="min-height: 70px">
         <div
-            class="row justify-content-center align-items-center myborder"
+            class="row justify-content-evenly align-items-center myborder"
             style="background-color: var(--violet_100)">
-            <div class="col-2 ms-3">
+            <div
+                class="col-2 ms-3"
+                :class="
+                    this.$route.name === 'detail' ? 'd-inline' : 'd-sm-none'
+                ">
                 <navigation-mobile></navigation-mobile>
             </div>
-            <div class="container-fluid my-3 col-5 d-flex">
-                <div class="d-flex col-8">
+            <div class="container my-3 col-6">
+                <div class="d-flex">
                     <input
-                        class="form-control me-2 border border-0 text-white"
+                        class="me-2 p-2 rounded-2 border border-0 text-white"
                         type="search"
                         placeholder="Search"
                         aria-label="Search"
-                        style="background-color: var(--bg_input)"
+                        style="background-color: var(--bg_input); width: 80%"
                         v-model="inputSearch"
                         @keyup.enter="gotoSearch(inputSearch)" />
                     <button
@@ -31,31 +35,30 @@
                 </div>
             </div>
             <div
-                class="d-flex gap-3 align-items-center justify-content-center account col-3"
+                class="d-none d-sm-flex gap-sm-3 align-items-center justify-content-center account col-3"
                 v-if="this.accountStore.account">
-                <div class="" style="">
-                    <router-link :to="{ name: 'editprofile' }"
-                        ><li class="dropdown-item" style="color: var(--text)">
-                            <img
-                                style="
-                                    width: 48px !important;
-                                    height: 48px !important;
-                                    border-radius: 50%;
-                                    object-fit: cover;
-                                "
-                                :src="this.accountStore.account.avatar.url"
-                                alt="" />
+                <div class="p-0 m-0" style="">
+                    <router-link
+                        :to="{
+                            name: 'profile',
+                            params: {
+                                accountId: this.accountStore.account._id,
+                            },
+                        }">
+                        <li class="dropdown-item" style="color: var(--text)">
+                            <avatar-circle
+                                :src="
+                                    this.accountStore.account.avatar.url
+                                "></avatar-circle>
                         </li>
                     </router-link>
                 </div>
                 <div class="dropdown">
                     <button
-                        class="btn btn-secondary dropdown-toggle"
+                        class="dropdown-toggle"
                         type="button"
                         data-bs-toggle="dropdown"
-                        aria-expanded="true">
-                        <span class="d-none d-lg-inline m-0">My Account</span>
-                    </button>
+                        aria-expanded="true"></button>
                     <ul class="dropdown-menu">
                         <router-link :to="{ name: 'editprofile' }"
                             ><li
@@ -82,6 +85,7 @@
 <script>
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
+import AvatarCircle from './AvatarCircle.vue';
 import NavigationMobile from './NavigationMobile.vue';
 export default {
     setup() {
@@ -92,13 +96,15 @@ export default {
     data() {
         return {
             inputSearch: null,
+            isDetailPage: this.$route.name === 'detail',
         };
     },
-    components: { NavigationMobile },
+    components: { NavigationMobile, AvatarCircle },
     methods: {
         removeAccount() {
             this.accountStore.account = {};
             localStorage.removeItem('id');
+            localStorage.removeItem('token');
         },
         gotoSearch(input) {
             this.videoStore.updateInputSearch(this.inputSearch);

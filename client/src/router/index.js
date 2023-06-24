@@ -62,6 +62,11 @@ const routes = [
         props: true,
     },
     {
+        path: '/chat',
+        name: 'chat',
+        component: () => import('@/views/Chat.vue'),
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'notfound',
         component: () => import('@/views/NotFound.vue'),

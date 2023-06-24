@@ -58,7 +58,6 @@
                             accept=".jpg,.png"
                             name="file"
                             multiple="false"
-                            validation="required"
                             @change="onFileSelected" />
 
                         <div class="d-flex justify-content-center">
@@ -108,9 +107,7 @@
     </div>
 </template>
 <script>
-import axios from 'axios';
 import FormData from 'form-data';
-import Navigation from '../components/Navigation.vue';
 import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
 import Loading from 'vue-loading-overlay';
@@ -138,13 +135,13 @@ export default {
         };
     },
     components: {
-        Navigation,
         Loading,
     },
     methods: {
         onFileSelected(event) {
             this.account.image = event.target.files[0];
-            this.urlImage = URL.createObjectURL(event.target.files[0]);
+            if (event.target.files[0])
+                this.urlImage = URL.createObjectURL(event.target.files[0]);
         },
         async checkNewAccount(username, email) {
             var flag = true;
@@ -171,33 +168,27 @@ export default {
             return flag;
         },
         async register() {
-            this.isLoading = true;
-
-            if (
-                !(await this.checkNewAccount(
-                    this.account.username,
-                    this.account.email,
-                ))
-            ) {
-                this.isLoading = false;
-
-                return;
-            }
-            const form = new FormData();
-            form.append('name', this.account.name);
-            form.append('username', this.account.username);
-            form.append('password', this.account.password);
-            form.append('email', this.account.email);
-            form.append('avatar', this.account.image);
             try {
+                this.isLoading = true;
+
+                const form = new FormData();
+                form.append('name', this.account.name);
+                form.append('username', this.account.username);
+                form.append('password', this.account.password);
+                form.append('email', this.account.email);
+                if (this.urlImage) form.append('avatar', this.account.image);
+
                 await accountService.create(form);
                 this.isLoading = false;
                 this.extraStore.myAlert('success', 'Create success! 🥳');
                 URL.revokeObjectURL(this.urlImage);
                 this.$router.push({ name: 'login' });
             } catch (error) {
+                console.log(
+                    '🚀 ~ file: Register.vue:187 ~ register ~ error:',
+                    error,
+                );
                 this.isLoading = false;
-                console.log(error);
                 this.extraStore.myAlert(
                     'error',
                     error.response.data.message || error.message,

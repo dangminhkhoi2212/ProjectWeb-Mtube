@@ -22,10 +22,6 @@ export default {
             ...this.option,
             container: this.$refs.artRef,
         });
-
-        this.$nextTick(() => {
-            this.$emit('get-instance', this.instance);
-        });
     },
     beforeDestroy() {
         if (this.instance && this.instance.destroy) {

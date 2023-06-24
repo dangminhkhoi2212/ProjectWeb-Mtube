@@ -1,12 +1,17 @@
 <template>
-    <nav
-        class="d-flex flex-column justify-content-start text-center text-xl-start gap-4 gap-xl-3 z-5">
-        <div id="logo" class="my-3 mx-auto" style="width: 20%">
-            <RouterLink :to="{ name: 'home' }" class="logo">
-                <img class="w-100" src="../assets/images/logo.png" alt="" />
+    <nav class="d-flex flex-column text-center text-xl-start z-5">
+        <div
+            id="logo"
+            class="mx-5"
+            style="width: 4rem; height: 5rem; justify-self: center">
+            <RouterLink
+                :to="{ name: 'home' }"
+                class="logo d-flex align-items-center gap-2">
+                <img src="../assets/images/logo.png" alt="" />
+                <span class="d-none d-md-inline fs-5 p-0 m-0">Mtube</span>
             </RouterLink>
         </div>
-        <hr class="m-0 p-0" />
+        <hr />
         <RouterLink :to="{ name: 'home' }" class="p-2 p-xl-3">
             <span class="text-white fs-5">
                 <span class="me-xl-2">
@@ -20,7 +25,7 @@
                 <span class="me-xl-2">
                     <i class="fa-solid fa-clapperboard"></i>
                 </span>
-                <span class="d-none d-xl-inline">Favorite Videos</span>
+                <span class="d-none d-xl-inline">Favorite </span>
             </span>
         </RouterLink>
         <RouterLink :to="{ name: 'uploadVideo' }" class="p-2 p-xl-3">
@@ -28,179 +33,18 @@
                 <span class="me-xl-2">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                 </span>
-                <span class="d-none d-xl-inline">Upload Video</span>
+                <span class="d-none d-xl-inline">Upload </span>
             </span>
         </RouterLink>
-        <div class="commingup p-4 p-xl-3" @click="commingup">
+        <RouterLink :to="{ name: 'chat' }" class="p-2 p-xl-3">
             <span class="text-white fs-5">
                 <span class="me-xl-2">
-                    <i class="fa-solid fa-comment fa-beat-fade"></i>
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
                 </span>
-                <span class="d-none d-xl-inline">Chat</span>
+                <span class="d-none d-xl-inline">Chat </span>
             </span>
-        </div>
+        </RouterLink>
     </nav>
-    <!-- <nav class="navbar navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasDarkNavbar"
-                aria-controls="offcanvasDarkNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div
-                class="offcanvas offcanvas-start text-bg-dark"
-                tabindex="-1"
-                id="offcanvasDarkNavbar"
-                aria-labelledby="offcanvasDarkNavbarLabel"
-                style="width: 70vw !important">
-                <div class="offcanvas-header">
-                    <h5
-                        class="offcanvas-title"
-                        id="offcanvasDarkNavbarLabel"></h5>
-                    <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="offcanvas"
-                        aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <div class="d-flex">
-                        <input
-                            class="form-control me-2"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-                            style="background-color: var(--bg_input)"
-                            v-model="inputSearch"
-                            @keyup.enter="gotoSearch(inputSearch)" />
-                        <button
-                            class="btn"
-                            @click="gotoSearch(inputSearch)"
-                            style="
-                                box-shadow: 0 0 1px 2px var(--btn);
-                                color: var(--text);
-                            ">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-
-                    <ul
-                        class="navbar-nav row justify-content-start flex-grow-1 gap-4 mt-5">
-                        <li class="nav-item col-12 mt-4">
-                            <RouterLink
-                                :to="{ name: 'home' }"
-                                class="p-2 p-xl-3">
-                                <span class="text-white fs-5">
-                                    <span class="me-2">
-                                        <i class="fa-brands fa-hotjar"></i>
-                                    </span>
-                                    <span class="my-2">Trending</span>
-                                </span>
-                            </RouterLink>
-                        </li>
-                        <li class="nav-item">
-                            <RouterLink
-                                :to="{ name: 'myvideos' }"
-                                class="p-2 p-xl-3">
-                                <span class="text-white fs-5">
-                                    <span class="me-2">
-                                        <i class="fa-solid fa-clapperboard"></i>
-                                    </span>
-                                    <span>My Videos</span>
-                                </span>
-                            </RouterLink>
-                        </li>
-                        <li class="nav-item">
-                            <div
-                                class="commingup p-2 p-xl-3"
-                                @click="commingup">
-                                <span class="text-white fs-5">
-                                    <span class="me-2">
-                                        <i
-                                            class="fa-solid fa-cloud-arrow-up fa-beat-fade"></i>
-                                    </span>
-                                    <span class="">Uploads</span>
-                                </span>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <div class="commingup px-2" @click="commingup">
-                                <span class="text-white fs-5">
-                                    <span class="me-2">
-                                        <i
-                                            class="fa-solid fa-comment fa-beat-fade"></i>
-                                    </span>
-                                    <span class="">Chat</span>
-                                </span>
-                            </div>
-                        </li>
-
-                        <li class="nav-item">
-                            <div
-                                class="d-flex gap-3 align-items-center justify-content-center"
-                                v-if="account">
-                                <div class="" style="">
-                                    <router-link to="/user/editprofile"
-                                        ><li
-                                            class="dropdown-item"
-                                            style="color: var(--text)">
-                                            <img
-                                                style="
-                                                    width: 60px !important;
-                                                    height: 60px !important;
-                                                    border-radius: 50%;
-                                                    object-fit: cover;
-                                                "
-                                                :src="account.image"
-                                                alt="" />
-                                        </li>
-                                    </router-link>
-                                </div>
-                                <div class="dropdown">
-                                    <button
-                                        class="btn btn-secondary dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="true">
-                                        <span class="">My Account</span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <router-link to="/user/editprofile"
-                                            ><li
-                                                class="dropdown-item"
-                                                style="color: var(--text)">
-                                                Edit Profile
-                                            </li>
-                                        </router-link>
-                                        <RouterLink to="/user/login"
-                                            ><li
-                                                @click="removeAccount()"
-                                                class="dropdown-item"
-                                                style="color: var(--text)">
-                                                Log out
-                                            </li>
-                                        </RouterLink>
-                                    </ul>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div
-                class="ms-4"
-                style="width: 2.5rem"
-                @click="this.extraStore.changeActive('Trending')">
-                <RouterLink :to="{ name: 'home' }" class="logo active_nav">
-                    <img class="w-100" src="../assets/images/logo.png" alt="" />
-                </RouterLink>
-            </div>
-        </div>
-    </nav> -->
-    <!-- <MobileMenu></MobileMenu> -->
 </template>
 <script>
 import { useAccountStore } from '../store/account';
@@ -232,12 +76,6 @@ export default {
                 this.$router.push({ name: 'search' });
             }
         },
-        commingup() {
-            this.extraStore.myAlert(
-                'info',
-                'This feature will appear in the future. 😊',
-            );
-        },
         removeAccount() {
             this.accountStore.account = {};
             localStorage.removeItem('id');
@@ -260,9 +98,5 @@ export default {
 <style scoped>
 .logo.active_nav {
     background-color: transparent;
-}
-.commingup {
-    cursor: pointer;
-    opacity: 0.6;
 }
 </style>

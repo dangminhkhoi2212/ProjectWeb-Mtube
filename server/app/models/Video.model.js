@@ -5,7 +5,10 @@ const siteService = require('../services/site');
 
 const VideoSchame = new Schema(
     {
-        accountId: { type: String, required: true },
+        accountId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Account',
+        },
         publishedAt: { type: String, required: true },
         channelTitle: { type: String, required: true },
         title: { type: String, required: true },
@@ -20,8 +23,8 @@ const VideoSchame = new Schema(
         likeCount: { type: Number, default: 0 },
         viewCount: { type: Number, default: 0 },
         image: { type: String },
-        description: { type: String },
-        tags: { type: Array },
+        description: { type: String, default: null },
+        tags: { type: Array, default: null },
         usersLike: [
             {
                 type: Schema.Types.ObjectId,

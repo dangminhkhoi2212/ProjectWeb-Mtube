@@ -9,7 +9,7 @@
     --btn_acctive: #886fa374;
     --scrollbar: #05767a;
     --text: #fff;
-    --text_title: #d24dd2;
+    --text_title: #b40fb4;
     --text_black: #333333;
     --text_white_50: #ffffffc6;
     --message: #16ca1c;
@@ -17,9 +17,11 @@
     --bg_input_focus: #632692;
     --bg_title: #48385c;
     --bg_card_infor: #3c1568;
-    --bg_form: #918c8c33;
+    --bg_form: #918c8c5d;
     --bg_detail_video: #4e2a7d53;
     --border: #7f669d;
     --link_hover: #af6ae9;
     --space_cover: #00000073;
+    --border_radius_video: 15px;
+    --box_shadow_input: #4e2a7d8d;
 }

@@ -10,7 +10,7 @@ export const useAccountStore = defineStore('account', {
             this.account = {};
             if (!id) return;
             try {
-                this.account = await accountService.get(id);
+                this.account = await accountService.getAccount(id);
             } catch (err) {
                 console.log(err);
             }

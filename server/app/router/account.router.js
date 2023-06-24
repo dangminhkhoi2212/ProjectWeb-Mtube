@@ -1,26 +1,50 @@
 const express = require('express');
 const router = express.Router();
 const accountController = require('../controllers/account.controller');
-const Account = require('../models/Account.model');
-const ApiError = require('../api.error');
 const multer = require('../lib/multerConfig');
-const cloudinary = require('../lib/cloudinary');
 const verifyToken = require('../middleware/account.middleware');
 
+router.route('/handleFollow').put(accountController.handleFollow);
+
+// ---------------------------------------------//
+
 router
-    .route('/myVideos/:id/:videoId')
+    .route('/favorite/:id')
+    .get(accountController.getFavorite)
+    .delete(accountController.removeAllFavoriteVideo);
+router
+    .route('/favorite/:id/:videoId')
     .put(accountController.addFavoriteVideo)
-    .delete(accountController.removeVideo);
+    .delete(accountController.removeFavoriteVideo);
+
+// ---------------------------------------------//
+
 router.route('/myVideos/:id').delete(accountController.removeAllVideo);
+router
+    .route('/myVideos/:accountId/:videoId')
+    .delete(accountController.removeMyVideo);
+
+// ---------------------------------------------//
+
 router
     .route('/:id')
     .get(accountController.findById)
-    .put(verifyToken, multer.single('avatar'), accountController.update)
-    .delete(accountController.delete);
+    .put(verifyToken, multer.single('avatar'), accountController.updateAccount)
+    .delete(accountController.deleteAccount);
+
+// ---------------------------------------------//
+
+router
+    .route('/editDetail/:accountId')
+    .put(verifyToken, accountController.editDetail);
+
 router.route('/login').post(accountController.login);
+
+// ---------------------------------------------//
+
 router
     .route('/')
     .get(accountController.findAll)
-    .post(multer.single('avatar'), accountController.create)
+    .post(multer.single('avatar'), accountController.createAccount)
     .delete(accountController.deleteAll);
 module.exports = router;

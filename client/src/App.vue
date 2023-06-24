@@ -10,18 +10,24 @@
             :is-full-page="fullPage" />
         <div
             v-if="this.$route.name !== 'detail'"
-            class="page row fixed-top vh-100 vl-parent position-relative"
+            class="page row fixed-top vh-100"
             style="overflow-x: hidden; overflow-y: auto">
             <Navigation
                 class="d-none d-sm-flex col-sm-2"
                 v-if="accountStore.checkAccount()"></Navigation>
-            <div id="main" class="col-sm-10 p-0" style="overflow-y: auto">
+            <div
+                id="main"
+                class="p-0"
+                :class="
+                    !accountStore.checkAccount() ? 'col-sm-12' : 'col-sm-10'
+                "
+                style="overflow-y: auto">
                 <Header v-if="accountStore.checkAccount()"></Header>
                 <router-view :key="this.$route" />
             </div>
         </div>
         <div
-            class="page row fixed-top vh-100 vl-parent"
+            class="page row fixed-top vh-100"
             style="overflow-x: hidden; overflow-y: auto"
             v-if="this.$route.name === 'detail'">
             <div id="main" class="col-sm-12 p-0" style="margin-top: 69px">

@@ -1,20 +1,24 @@
 <template>
     <div class="">
         <p class="fs-5">{{ comments.length }} comments</p>
-        <div class="input-group my-4 pt-md-2">
-            <img
-                :src="commentOfUser.userImage"
-                alt=""
-                style="width: 48px; height: 48px; object-fit: cover"
-                class="rounded-5 col-1 mx-3" />
-            <input
+        <div class="input-group my-4 pt-md-2 d-flex align-items-center">
+            <router-link
+                v-if="commentOfUser.accountId"
+                :to="{
+                    name: 'profile',
+                    params: { accountId: commentOfUser.accountId },
+                }">
+                <AvatarCircle
+                    class="mx-3"
+                    :src="commentOfUser.userImage"></AvatarCircle>
+            </router-link>
+            <textarea
                 type="text"
-                class="form-control fs-5 h-100"
+                class="form-control rounded-3 me-2 h-100 fs-5"
                 placeholder="Add a comment..."
                 aria-label="Bình luận về video"
-                aria-describedby="button-addon2"
                 v-model="content"
-                @keyup.enter="addComment()" />
+                @keyup.enter="addComment()"></textarea>
             <button
                 class="rounded-1 h-100 text-center"
                 data-bs-toggle="modal"
@@ -31,45 +35,66 @@
                 v-for="(cmt, index) in comments"
                 :key="index"
                 class="row align-items-center">
-                <div class="col-11">
-                    <div class="">
+                <div class="p-0 position-relative">
+                    <div class="col-10 col-sm-11">
                         <router-link
+                            v-if="cmt.accountId"
                             :to="{
                                 name: 'profile',
-                                params: { accountId: cmt.userId },
+                                params: { accountId: cmt.accountId },
                             }"
-                            class="d-flex gap-2 my-2 justify-content-start">
-                            <img
-                                style="
-                                    width: 48px;
-                                    height: 48px;
-                                    object-fit: cover;
-                                "
-                                :src="cmt.userImage"
-                                class="rounded-5"
-                                alt="..."
-                                referrerpolicy="no-referrer" />
-                            <p class="fs-5">{{ cmt.userName }}</p>
+                            class="d-flex gap-2 my-2 align-items-center">
+                            <AvatarCircle :src="cmt.userImage"></AvatarCircle>
+                            <div
+                                class="d-flex flex-column flex-sm-row align-items-start justify-content-center gap-sm-3">
+                                <div
+                                    class="d-flex flex-column justify-content-start">
+                                    <span
+                                        class="fs-sm-5 px-2 rounded-5"
+                                        :class="
+                                            cmt.accountId === this.accountId
+                                                ? 'isAccount'
+                                                : ''
+                                        ">
+                                        {{ cmt.userName }}
+                                    </span>
+                                    <span
+                                        class="px-2"
+                                        style="
+                                            color: var(--text_white_50);
+                                            font-size: 0.8rem;
+                                            font-weight: 300;
+                                        ">
+                                        Subscrible
+                                    </span>
+                                </div>
+                                <p
+                                    class="px-2 m-0 fw-light"
+                                    style="font-size: 0.8rem"
+                                    v-if="cmt.publishedAt">
+                                    {{ cmt.publishedAt }}
+                                </p>
+                            </div>
                         </router-link>
+                        <p
+                            class="text-break my-2"
+                            style="white-space: pre-line"
+                            :key="index">
+                            {{ cmt.textOriginal }}
+                        </p>
                     </div>
-                    <p
-                        class="text-break"
-                        style="white-space: pre-line"
-                        :key="index">
-                        {{ cmt.textOriginal }}
-                    </p>
-                    <p>{{ cmt.publishedAt }}</p>
+                    <button
+                        class="rounded-2 p-0 position-absolute top-50 end-0 translate-middle-y"
+                        @click="deleteComment(cmt)"
+                        v-show="
+                            cmt.accountId === this.accountStore.account._id ||
+                            admin
+                        "
+                        style="height: 30px; width: 40px">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 </div>
-                <button
-                    class="rounded-2 col-2 p-0"
-                    @click="deleteComment(cmt)"
-                    v-show="
-                        cmt.userId === this.accountStore.account._id || admin
-                    "
-                    style="height: 30px; width: 40px">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-                <hr />
+                <hr class="m-0" />
             </div>
             <loading
                 v-model:active="isLoading"
@@ -87,10 +112,11 @@
 import commentService from '../services/comment.service';
 import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
-import site from '../services/site.service';
+import { getToDay, convertISOTime } from '../utils/date.utils';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import Swal from 'sweetalert2';
+import AvatarCircle from './AvatarCircle.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -100,9 +126,9 @@ export default {
     },
     props: {
         videoId: { type: String },
-        admin: false,
+        accountId: { type: String },
     },
-    components: { Loading },
+    components: { Loading, AvatarCircle },
     data() {
         return {
             isLoading: false,
@@ -111,11 +137,11 @@ export default {
             content: '',
             commentOfUser: {
                 videoId: this.videoId,
-                userId: this.accountStore.account._id,
+                accountId: this.accountStore.account._id,
                 userName: this.accountStore.account.name,
                 userImage: this.accountStore.account.avatar.url,
-                textOriginal: new String(),
-                publishedAt: site.getToDay(),
+                textOriginal: '',
+                publishedAt: getToDay(),
             },
         };
     },
@@ -124,7 +150,16 @@ export default {
     methods: {
         async getComments() {
             try {
-                this.comments = await commentService.getAll(this.videoId);
+                this.comments = (await commentService.getAll(this.videoId)).map(
+                    (cmt) => {
+                        const time = convertISOTime(cmt.publishedAt);
+                        console.log(
+                            '🚀 ~ file: Comment.vue:145 ~ getComments ~ time:',
+                            time,
+                        );
+                        return { ...cmt, publishedAt: time };
+                    },
+                );
             } catch (err) {
                 console.log(err);
             }
@@ -137,10 +172,8 @@ export default {
                 var comment = document.querySelector('#comment');
                 comment.scrollTop = 0;
                 this.isLoading = true;
-                const newComment = await commentService.create(
-                    this.commentOfUser,
-                );
-                await this.comments.push({ ...newComment });
+                await commentService.create(this.commentOfUser);
+                await this.getComments();
                 this.isLoading = false;
                 this.content = '';
 
@@ -201,16 +234,20 @@ export default {
 </script>
 
 <style scoped>
+.isAccount {
+    background-color: var(--text_title);
+}
 .input-group {
     height: 3rem;
 }
-.input-group input {
+.input-group textarea {
     background-color: var(--bg_input);
     color: var(--text);
     border: none;
     box-shadow: none;
+    resize: none;
 }
-.input-group input:focus {
+.input-group textarea:focus {
     border: none;
     box-shadow: 0px 0px 6px 2px var(--btn_send);
 }

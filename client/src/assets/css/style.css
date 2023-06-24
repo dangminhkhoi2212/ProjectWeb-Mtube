@@ -31,7 +31,8 @@ h4 {
 button {
     border: none;
 }
-video {
+video,
+img {
     width: 100%;
     height: 100%;
 }
@@ -46,16 +47,22 @@ textarea.formkit-input {
 }
 option {
     color: var(--text_black);
+    background-color: var(--box_shadow_input);
 }
-input {
-    word-wrap: break-word !important;
-}
-input:focus {
-    border: none !important;
+input,
+textarea,
+select {
     outline: none !important;
-    box-shadow: 0px 0px 6px 2px var(--btn_hover) !important;
+    box-shadow: 0px 0px 0px 3px var(--box_shadow_input) !important;
+    word-wrap: break-word !important;
+    background-color: var(--bg_input);
+    border: none;
+    border-radius: 5px;
 }
-
+input::placeholder {
+    color: var(--text);
+    font-style: italic;
+}
 .formkit-messages {
     color: red;
 }
@@ -63,11 +70,17 @@ input:focus {
     color: var(--message);
 }
 [data-invalid] .formkit-inner {
-    box-shadow: 0 0 0 1px red;
+    box-shadow: 0 0 0 2px red;
 }
 
 [data-complete] .formkit-inner {
-    box-shadow: 0 0 0 2px var(--btn_hover);
+    box-shadow: 0 0 0 3px var(--btn_hover) !important;
+}
+[data-multiple] .formkit-outer {
+    background-color: blueviolet;
+}
+[data-type='file'] .formkit-no-files {
+    color: var(--text) !important;
 }
 /* -------------- */
 .dropdown button {
@@ -105,6 +118,7 @@ input:focus {
 }
 ::-webkit-scrollbar {
     width: 10px;
+    display: none;
 }
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -121,7 +135,7 @@ input:focus {
     background-color: var(--btn);
     color: var(--text);
     transition: all 0.2s linear;
-    padding: 1rem;
+    padding: 0.7rem;
     cursor: pointer;
 }
 
@@ -136,4 +150,8 @@ input:focus {
 .swal2-popup {
     font-size: 0.8rem !important;
     padding: 0.5rem;
+}
+.customArtplayer .art-bottom,
+.customArtplayer .art-mask {
+    display: none !important;
 }

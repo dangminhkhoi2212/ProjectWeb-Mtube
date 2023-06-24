@@ -28,8 +28,8 @@ class VideoService {
     async unlike(id, videoId) {
         return (await this.api.delete(`/${id}/${videoId}`)).data;
     }
-    async addView(id) {
-        return (await this.api.put(`/${id}`)).data;
+    async addView(videoId) {
+        return (await this.api.put(`/${videoId}`)).data;
     }
 }
 export default new VideoService();

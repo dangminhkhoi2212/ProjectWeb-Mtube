@@ -1,13 +1,6 @@
 <template>
-    <div class="row mt-5 mt-md-0 text-break vl-parent px-lg-5">
-        <div class="col-12 col-xl-8">
-            <!-- <VideoController
-                id="video"
-                class="mt-5 mt-sm-0 w-100"
-                style=""
-                :src="urlVideo"
-                :autoplay="false"
-                :controls="true"></VideoController> -->
+    <div class="row mt-md-0 text-break vl-parent px-2">
+        <div class="col-12 col-lg-7 col-xl-8">
             <Artplayer v-if="urlVideo" :option="option" :style="style" />
             <div class="">
                 <p class="p-0 fs-4">
@@ -21,20 +14,20 @@
                             :to="{
                                 name: 'profile',
                                 params: {
-                                    accountId: video.accountId,
+                                    accountId: video.accountId._id,
                                 },
                             }">
-                            <img
-                                :src="avatarChannel"
-                                alt=""
-                                style="
-                                    width: 48px;
-                                    height: 48px;
-                                    object-fit: cover;
-                                "
-                                class="rounded-5 col-1 mx-3" />&nbsp;
-                            {{ video.channelTitle }}</RouterLink
-                        >
+                            <div class="d-flex align-items-center">
+                                <AvatarCircle
+                                    class="p-2"
+                                    :src="
+                                        video.accountId.avatar.url
+                                    "></AvatarCircle>
+                                <span class="fs-5 d-inline">
+                                    {{ video.channelTitle }}
+                                </span>
+                            </div>
+                        </RouterLink>
                     </p>
 
                     <div
@@ -55,7 +48,7 @@
                         <div class="fs-5">
                             <i
                                 class="fa-solid fa-folder-plus btn-reacte rounded-4"
-                                @click="addVideo(video._id)"></i
+                                @click="addFavoriteVideo(video._id)"></i
                             >&nbsp; <span>Favorite</span>
                         </div>
                     </div>
@@ -96,21 +89,23 @@
                     </div>
                 </div>
             </div>
-            <!-- add :key to refresh component -->
-            <div class="col-sm-12 my-4">
+            <div v-if="video.allowComment" class="col-sm-12 my-4">
                 <Comment
                     :key="video._id"
                     :videoId="video._id"
-                    :admin="
-                        video.accountId === this.accountStore.account._id
-                    "></Comment>
+                    :accountId="video.accountId._id"></Comment>
+            </div>
+            <div v-else class="col-sm-12 my-4 text-center">
+                <span class="fs-5">Blocked comment</span>
             </div>
         </div>
-        <div class="col-12 col-xl-4">
+
+        <div class="col-12 col-lg-5 col-xl-4 p-0 m-0">
             <VideoCard
-                :category="video.category"
-                :key="video._id"
-                :videoIdCurrent="video._id"></VideoCard>
+                :class="this.$route.name === 'detail' ? 'customArtplayer' : ''"
+                :videos="relaviteVideos"
+                :option="optionRelativeVideo"
+                :style="styleRelativeVideo"></VideoCard>
         </div>
         <loading
             v-model:active="isLoading"
@@ -134,9 +129,11 @@ import { useExtraStore } from '../store/extra';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import VideoCard from '../components/VideoCard.vue';
-import VideoRelate from '../components/VideoRelate.vue';
-import VideoController from '../components/VideoController.vue';
 import Artplayer from '../components/Artplayer.vue';
+import alertUtil from '../utils/myAlert';
+import { convertISOTime, convertISODate } from '../utils/date.utils';
+
+import AvatarCircle from '../components/AvatarCircle.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -150,9 +147,8 @@ export default {
         Comment,
         Loading,
         VideoCard,
-        VideoRelate,
-        VideoController,
         Artplayer,
+        AvatarCircle,
     },
     props: {
         id: {
@@ -163,6 +159,7 @@ export default {
     data() {
         return {
             video: {},
+            relaviteVideos: [],
             urlVideo: '',
             liked: false,
             isLoading: true,
@@ -171,7 +168,7 @@ export default {
             isShow: false,
             avatarChannel: '',
             option: {
-                autoplay: true,
+                autoplay: false,
                 pip: true,
                 screenshot: true,
                 setting: true,
@@ -193,6 +190,15 @@ export default {
             style: {
                 width: '100%',
                 height: '480px',
+                marginBottom: '1rem',
+            },
+            optionRelativeVideo: {
+                autoplay: false,
+            },
+            styleRelativeVideo: {
+                width: '100%',
+                height: '120px',
+                borderRadius: '15px',
             },
         };
     },
@@ -201,8 +207,10 @@ export default {
             try {
                 this.video = await videoService.get(id);
                 this.format;
+
                 this.urlVideo = this.video.videoUpload.url;
                 this.option.url = this.urlVideo;
+
                 for (let i = 0; i < this.video.usersLike.length; i++) {
                     if (
                         JSON.parse(JSON.stringify(this.video.usersLike[i])) ===
@@ -222,8 +230,49 @@ export default {
                 });
             }
         },
-        addVideo(id) {
-            this.accountStore.addVideo(id);
+        async getRelativeVideo() {
+            try {
+                const relative = this.video.category;
+                const result = await videoService.getAll();
+
+                this.relaviteVideos = result.filter(
+                    (video) =>
+                        video.category === relative &&
+                        video._id !== this.video._id,
+                );
+                this.relaviteVideos = this.relaviteVideos.map((video) => {
+                    const datetemp = convertISODate(video.publishedAt);
+                    return { ...video, publishedAt: datetemp };
+                });
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: DetailVideo.vue:231 ~ getRelativeVideo ~ error:',
+                    error,
+                );
+            }
+        },
+        async addFavoriteVideo(videoId) {
+            try {
+                const result = await accountService.addFavoriteVideo(
+                    this.accountStore.account._id,
+                    videoId,
+                );
+                if (result.added)
+                    alertUtil.myAlert(
+                        'success',
+                        "Added into your 'My Videos' 🥳",
+                    );
+                else
+                    alertUtil.myAlert(
+                        'error',
+                        "This Video exist in your 'My Videos'😭",
+                    );
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: DetailVideo.vue:322 ~ addFavoriteVideo ~ error:',
+                    error,
+                );
+            }
         },
         async like(id, videoId) {
             await videoService.like(id, videoId);
@@ -245,10 +294,6 @@ export default {
                 );
             await this.getVideo(this.id);
         },
-        async getAvatarChannel(id) {
-            const data = await accountService.get(id);
-            this.avatarChannel = data.avatar.url;
-        },
     },
     computed: {
         format() {
@@ -257,23 +302,19 @@ export default {
         },
     },
     async mounted() {
-        await this.getVideo(this.id);
-        await this.getAvatarChannel(this.video.accountId);
-        await videoService.addView(this.video._id);
+        await videoService.addView(this.id);
 
+        await this.getVideo(this.id);
+        this.video.publishedAt = `${convertISOTime(
+            this.video.publishedAt,
+        )}, ${convertISODate(this.video.publishedAt)}`;
+
+        await this.getRelativeVideo();
         this.isLoading = false;
     },
 };
 </script>
 <style scoped>
-#video {
-    height: 50vh !important;
-}
-@media screen and (max-width: 444px) {
-    #video {
-        height: 30vh !important;
-    }
-}
 .like {
     color: red;
 }

@@ -12,7 +12,6 @@ router
     .route('/:videoId')
     .put(VideoController.update)
     .delete(VideoController.delete);
-router.route('/api').post(VideoController.createWithApi);
 router
     .route('/')
     .get(VideoController.findAll)

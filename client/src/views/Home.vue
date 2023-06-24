@@ -1,17 +1,28 @@
 <template>
     <section id="main">
         <Carousel v-model="categoryActive"></Carousel>
-        <VideoCard
-            :inputSearch="null"
-            :key="categoryActive"
-            :category="categoryActive"></VideoCard>
+        <div
+            class="container px-1 px-lg-5"
+            style="height: 82vh; overflow-y: auto">
+            <VideoCard
+                class="customArtplayer"
+                :videos="categoryVideos"
+                :style="style"
+                :option="option"></VideoCard>
+        </div>
     </section>
 </template>
 <script>
-import VideoCard from '../components/VideoCard.vue';
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
+import { convertISODate } from '../utils/date.utils';
+
 import Carousel from '../components/Carousel.vue';
+
+import videoService from '../services/video.service';
+import VideoCard from '../components/VideoCard.vue';
+import Artplayer from '../components/Artplayer.vue';
+
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -19,17 +30,60 @@ export default {
         return { accountStore, videoStore };
     },
     components: {
-        VideoCard,
         Carousel,
+        VideoCard,
+        Artplayer,
     },
 
     data() {
-        return { categoryActive: 'All' };
+        return {
+            categoryActive: 'All',
+            videos: [],
+            categoryVideos: [],
+            option: {},
+            style: {
+                width: '100%',
+                height: '180px',
+                borderRadius: 'var(--border_radius_video)',
+            },
+        };
     },
-    methods: {},
+    watch: {
+        categoryActive() {
+            if (this.categoryActive !== 'All')
+                this.categoryVideos = this.videos.filter(
+                    (video) => video.category === this.categoryActive,
+                );
+            else this.categoryVideos = this.videos;
+            console.log(
+                '🚀 ~ file: Home.vue:53 ~ mounted ~ this.videos:',
+                this.categoryVideos,
+            );
+        },
+    },
+    methods: {
+        async getAllVideos() {
+            try {
+                this.videos = JSON.parse(
+                    JSON.stringify(await videoService.getAll()),
+                );
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: Home.vue:34 ~ methods:{getAllVideos ~ error:',
+                    error,
+                );
+            }
+        },
+    },
     computed: {},
-    mounted() {
-        console.log(this.categoryActive);
+    async mounted() {
+        await this.getAllVideos();
+
+        this.videos = this.videos.map((video) => {
+            const time = convertISODate(video.publishedAt);
+            return { ...video, publishedAt: time };
+        });
+        this.categoryVideos = this.videos;
     },
 };
 </script>
@@ -37,34 +91,7 @@ export default {
 .active_link {
     background-color: var(--btn);
 }
-
-ul li {
-    padding: 0.3rem 0.6rem;
-    background-color: var(--btn_hover);
-}
-ul li:hover {
-    background-color: var(--btn);
-}
-ul {
-    overflow-x: scroll;
-    white-space: nowrap;
-}
-
-ul::-webkit-scrollbar {
-    width: 8px;
-}
-
-ul::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
-}
-
-ul::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-ul::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
+.art-video-player .art-mask {
+    display: none !important;
 }
 </style>

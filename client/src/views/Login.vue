@@ -26,6 +26,7 @@
                             help="Enter a new password"
                             validation="required"
                             validation-visibility="live"
+                            placeholder="Your password"
                             v-model="password" />
                         <button
                             class="submit col-md-6 offset-md-3 rounded-2 py-1 my-2"
@@ -53,7 +54,6 @@
     </div>
 </template>
 <script>
-import Navigation from '../components/Navigation.vue';
 import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
@@ -72,9 +72,7 @@ export default {
             message: '',
         };
     },
-    components: {
-        Navigation,
-    },
+    components: {},
     methods: {
         async gotoHome() {
             try {
@@ -88,7 +86,8 @@ export default {
                 }
                 localStorage.removeItem('id');
                 localStorage.setItem('id', this.account._id);
-                await this.accountStore.getAccount();
+                this.accountStore.account = this.account;
+                localStorage.setItem('token', this.account.token);
                 this.$router.push({ name: 'home' });
             } catch (err) {
                 alertUtil.myAlert('error', err.response.data.message);

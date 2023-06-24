@@ -6,14 +6,11 @@
         <div
             class="rounded-4 p-4 col-12 col-sm-10 col-md-8 col-lg-6 col-xxl-4 overflow-auto"
             style="backdrop-filter: blur(25px); height: 80vh">
-            <div class="row">
-                <div
-                    class="mx-auto mt-2"
-                    style="width: 10rem; max-height: 10rem">
+            <div class="">
+                <div class="mx-auto" style="width: 100px; height: 100px">
                     <img
-                        class="w-100 h-100 rounded-5 img-fluid"
                         :src="urlImage"
-                        style="object-fit: cover" />
+                        style="object-fit: cover; border-radius: 50%" />
                 </div>
                 <FormKit
                     type="form"
@@ -177,6 +174,7 @@ export default {
                 await this.accountStore.getAccount();
 
                 this.changePassword = false;
+                this.account.password = null;
                 this.changeAvtar = false;
                 this.isLoading = false;
                 URL.revokeObjectURL(this.urlImage);

@@ -1,8 +1,6 @@
 <template>
-    <div
-        v-if="this.$route.name === 'detail'"
-        class="d-flex align-items-center gap-5 sticky-top">
-        <div>
+    <div class="d-flex align-items-center gap-4 gap-sm-5">
+        <div class="">
             <i
                 v-if="!isShow"
                 role="button"
@@ -19,11 +17,14 @@
             id="logo"
             class=""
             style="width: 35px; height: 40px">
-            <RouterLink :to="{ name: 'home' }" class="logo">
+            <RouterLink
+                :to="{ name: 'home' }"
+                class="d-flex align-items-center gap-2 logo">
                 <img
                     style="width: 40px; height: 40px"
                     src="../assets/images/logo.png"
                     alt="" />
+                <span class="d-none d-md-inline fs-5">Mtube</span>
             </RouterLink>
         </div>
     </div>
@@ -38,8 +39,7 @@
             height: calc(100vh - var(--width_header));
         "></div>
     <Navigation
-        v-if="this.$route.name === 'detail'"
-        class="d-sm-flex col-sm-2 nav z-10000"
+        class="d-sm-flex col-sm-2 nav z-10000 p-3"
         :class="{ active: isShow }"></Navigation>
 </template>
 

@@ -1,5 +1,7 @@
 <template>
-    <div class="overflow-auto p-3" style="height: 90vh">
+    <div
+        class="row justify-content-center align-items-center overflow-auto p-3 main_container"
+        style="height: 90vh">
         <FormKit
             type="form"
             v-model="formData"
@@ -14,12 +16,16 @@
                         src="../assets/images/upload_illustration.svg"
                         alt="" />
 
-                    <VideoController
-                        :src="urlVideoLocal"
-                        class="mb-3"
-                        style="height: 60vh"
-                        :autoplay="true"
-                        :controls="true" />
+                    <Artplayer
+                        :key="urlVideoLocal"
+                        v-else-if="urlVideoLocal"
+                        :option="{ ...option, url: urlVideoLocal }"
+                        class="mb-3 overflow-hidden"
+                        :style="{
+                            height: '60vh',
+                            width: '100%',
+                            borderRadius: 'var(--border_radius_video)',
+                        }"></Artplayer>
                     <FormKit
                         type="file"
                         label="Select a video as you would like"
@@ -117,10 +123,12 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import VideoController from '../components/VideoController.vue';
 import { useAccountStore } from '../store/account';
-import siteService from '../services/site.service';
+import { getToDay, convertISOTime } from '../utils/date.utils';
 import FormData from 'form-data';
 import videoService from '../services/video.service';
 import alertUtils from '../utils/myAlert';
+import Artplayer from '../components/Artplayer.vue';
+import { option } from 'artplayer';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -129,6 +137,7 @@ export default {
     components: {
         VideoController,
         Loading,
+        Artplayer,
     },
     data() {
         return {
@@ -140,11 +149,32 @@ export default {
             fullPage: true,
             onCancel: false,
             showOptions: false,
+            option: {
+                autoplay: false,
+                pip: true,
+                screenshot: true,
+                setting: true,
+                loop: false,
+                flip: true,
+                playbackRate: true,
+                aspectRatio: true,
+                fullscreen: true,
+                fullscreenWeb: true,
+                subtitleOffset: true,
+                miniProgressBar: true,
+                mutex: true,
+                backdrop: true,
+                playsInline: true,
+                autoPlayback: true,
+                airplay: true,
+                theme: '#4e2a7d',
+            },
         };
     },
     methods: {
         onChangeFile(e) {
             this.video = e.target.files[0];
+            URL.revokeObjectURL(this.urlVideoLocal);
             this.urlVideoLocal = URL.createObjectURL(e.target.files[0]);
             setTimeout(() => {
                 this.showOptions = true;
@@ -157,7 +187,7 @@ export default {
                 var data = JSON.parse(JSON.stringify(this.formData));
                 const form = new FormData();
                 form.append('accountId', this.accountStore.account._id);
-                form.append('publishedAt', siteService.getToDay());
+                form.append('publishedAt', getToDay());
                 form.append('channelTitle', this.accountStore.account.name);
                 form.append('title', data.title);
                 form.append('video', this.video);
@@ -168,9 +198,14 @@ export default {
                 form.append('category', data.category);
 
                 await videoService.create(form);
-                this.$router.push({ name: 'home' });
-                alertUtils.myAlert('success', 'Successfully uploaded video');
+                await alertUtils.myAlert(
+                    'success',
+                    'Successfully uploaded video',
+                );
                 this.isLoading = false;
+                URL.revokeObjectURL(this.urlVideoLocal);
+
+                this.$router.push({ name: 'home' });
             } catch (error) {
                 console.error(error);
                 alertUtils.myAlert(
@@ -184,4 +219,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.main_container {
+    background-image: url('../assets/images/background_videoUpload.png');
+}
+</style>

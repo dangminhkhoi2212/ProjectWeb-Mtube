@@ -29,5 +29,12 @@ export default defineConfig({
             },
         },
     },
+    compilerOptions: {
+        isCustomElement: (tagName) => {
+            return (
+                tagName === 'vue-advanced-chat' || tagName === 'emoji-picker'
+            );
+        },
+    },
     publicPath: process.env.NODE_ENV === 'production' ? '/Video_Client/' : '/',
 });
