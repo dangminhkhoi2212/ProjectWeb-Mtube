@@ -84,6 +84,10 @@ export default {
             return { ...video, publishedAt: time };
         });
         this.categoryVideos = this.videos;
+        console.log(
+            '🚀 ~ file: Home.vue:87 ~ mounted ~ this.categoryVideos:',
+            this.categoryVideos,
+        );
     },
 };
 </script>

@@ -117,6 +117,8 @@ import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
+import { signupRest, updateAvatarRest } from '../services/ChatEngine';
+
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -173,11 +175,20 @@ export default {
                 );
                 await this.accountStore.getAccount();
 
+                //update avatar in ChatEngine
+                if (this.newimage)
+                    await updateAvatarRest(
+                        '@' + this.accountStore.account.username,
+                        this.accountStore.account._id,
+                        this.newimage,
+                    );
+
+                URL.revokeObjectURL(this.urlImage);
+
                 this.changePassword = false;
                 this.account.password = null;
                 this.changeAvtar = false;
                 this.isLoading = false;
-                URL.revokeObjectURL(this.urlImage);
 
                 this.extraStore.myAlert('success', ' Updated successfully 🥳');
             } catch (error) {

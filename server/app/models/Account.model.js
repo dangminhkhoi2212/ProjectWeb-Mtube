@@ -56,9 +56,9 @@ const AccountSchame = new Schema(
         following: [{ type: Schema.Types.ObjectId, ref: 'Account' }],
         biography: { type: String, max: 2000, default: '' },
         media: {
-            facebook: { type: String, default: '#' },
-            instagram: { type: String, default: '#' },
-            tiktok: { type: String, default: '#' },
+            facebook: { type: String, default: '' },
+            instagram: { type: String, default: '' },
+            tiktok: { type: String, default: '' },
         },
         token: { type: String },
     },

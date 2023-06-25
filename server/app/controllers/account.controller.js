@@ -7,6 +7,7 @@ const {
     uploadToCloudinary,
     deleteFile,
     deleteFolder,
+    createFolder,
 } = require('../services/cloudinary.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -95,6 +96,7 @@ class Methods {
                 password: hashedPassword,
             };
             const createdAccount = await Account.create(newAccount);
+            await createFolder(`accounts/${createdAccount._id}`);
             const file = req.file;
             if (file) {
                 const result = await uploadToCloudinary(
@@ -133,11 +135,12 @@ class Methods {
     }
     async findById(req, res, next) {
         try {
-            var account = await Account.findById(req.params.id).populate({
-                path: 'myVideos',
-                populate: { path: 'accountId', select: 'avatar' },
-            });
-            delete account._doc.password;
+            var account = await Account.findById(req.params.id)
+                .select('-password')
+                .populate({
+                    path: 'myVideos',
+                    populate: { path: 'accountId', select: 'avatar' },
+                });
             res.send(account);
         } catch (error) {
             next(new ApiError(404, error.message));
@@ -341,7 +344,8 @@ class Methods {
 
             if (file) {
                 if (account.avatar.public_id)
-                    await deleteFile(account.avatar.public_id);
+                    await deleteFile(account.avatar.public_id, 'imgae');
+
                 const result = await uploadToCloudinary(
                     file.path,
                     'image',
@@ -370,42 +374,53 @@ class Methods {
             const id = req.params.id;
             const password = req.body.password;
 
-            var accountDelete = await Account.findById(id).populate('myVideos');
+            const accountDelete = await Account.findById(id).populate(
+                'myVideos',
+            );
 
             const invalid = await bcrypt.compare(
                 password,
                 accountDelete.password,
             );
+
             if (invalid) {
-                //Delete in cloundinary
-                await deleteFile(accountDelete.avatar.public_id, 'image');
-                var assetsArray = [];
-                assetsArray = accountDelete.myVideos.map(
+                // Delete in cloudinary
+                if (accountDelete.avatar.public_id)
+                    await deleteFile(accountDelete.avatar.public_id, 'image');
+                if (accountDelete.cover.public_id)
+                    await deleteFile(accountDelete.cover.public_id, 'image');
+                const assetsArray = accountDelete.myVideos.map(
                     (video) => video.videoUpload.public_id,
                 );
 
-                assetsArray.forEach(async (asset) => {
-                    await deleteFile(asset, 'video');
-                });
-                // wait for the files above to be completely deleted
-                setTimeout(async () => {
-                    await deleteFolder(`accounts/${id}`);
-                }, 1000);
+                await Promise.all(
+                    assetsArray.map((asset) => deleteFile(asset, 'video')),
+                );
 
-                //Delete in mongodb
+                // Wait for the files above to be completely deleted
+                await deleteFolder(`accounts/${id}`);
+
+                // Delete in MongoDB
                 await Video.deleteMany({ accountId: id });
                 await Comment.deleteMany({ accountId: id });
-                accountDelete.myVideos.forEach(async (videoId) => {
-                    await Comment.deleteOne({ videoId: videoId._id });
-                });
-                await Account.findOneAndDelete(id);
+
+                await Promise.all(
+                    accountDelete.myVideos.map((videoId) =>
+                        Comment.deleteOne({ videoId: videoId._id }),
+                    ),
+                );
+
+                await Account.findByIdAndDelete(id);
 
                 res.send('Deleted successfully');
-            } else next(new ApiError(400, 'Passwords do not match'));
+            } else {
+                throw new ApiError(400, 'Passwords do not match');
+            }
         } catch (error) {
             next(new ApiError(500, error));
         }
     }
+
     async handleFollow(req, res, next) {
         try {
             const { accountIdA, accountIdB, status } = req.body;
@@ -464,6 +479,35 @@ class Methods {
                 });
 
             res.send(result);
+        } catch (error) {
+            next(new ApiError(500, error));
+        }
+    }
+    async updateCover(req, res, next) {
+        try {
+            const file = req.file;
+            const accountId = req.params.accountId;
+            if (file) {
+                const account = await Account.findById(accountId);
+                if (account.cover.public_id)
+                    deleteFile(account.cover.public_id, 'image');
+                const { public_id, url } = await uploadToCloudinary(
+                    file.path,
+                    'image',
+                    `accounts/${accountId}`,
+                );
+                const reuslt = await Account.findByIdAndUpdate(
+                    accountId,
+                    { cover: { public_id, url } },
+                    { new: true },
+                )
+                    .select('-password -token -username -email')
+                    .populate({
+                        path: 'myVideos',
+                        populate: { path: 'accountId', select: 'avatar' },
+                    });
+                res.send(reuslt);
+            }
         } catch (error) {
             next(new ApiError(500, error));
         }

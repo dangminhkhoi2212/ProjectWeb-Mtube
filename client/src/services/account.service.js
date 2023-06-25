@@ -42,8 +42,13 @@ class AccountService {
         return (await this.api.put(`/editDetail/${accountId}`, data, config))
             .data;
     }
-    async delete(id) {
-        return (await this.api.delete(`/${id}`)).data;
+    async updateCover(accountId, data) {
+        return (await this.api.put(`/updateCover/${accountId}`, data, config))
+            .data;
+    }
+    async delete(accountId, password) {
+        return (await this.api.post(`/${accountId}`, { password }, config))
+            .data;
     }
     async getFavoriteVideos(id) {
         return (await this.api.get(`/favorite/${id}`)).data;

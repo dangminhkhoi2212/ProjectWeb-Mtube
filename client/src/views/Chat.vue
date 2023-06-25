@@ -1,30 +1,53 @@
 <template>
-    <vue-advanced-chat
-        :current-user-id="currentUserId"
-        :rooms="JSON.stringify(rooms)"
-        :messages="JSON.stringify(messages)"
-        :room-actions="JSON.stringify(roomActions)" />
+    <div style="height: calc(100vh - 80px)">
+        <PrettyChatWindow
+            :projectId="projectId"
+            :username="username"
+            :secret="secret" />
+    </div>
 </template>
 
+<style>
+.ce-new-chat-button {
+    width: 32px;
+    position: relative;
+    bottom: 22px;
+}
+.ce-chat-card,
+.ce-my-message-body {
+    background-color: var(--btn) !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+.ce-avatar {
+    box-shadow: 0 0 1px 0.8px var(--text) !important;
+}
+.ce-my-message-body,
+.ce-their-message-body {
+    /* box-shadow: 0 0 0.1px 0.5px var(--text) !important; */
+    padding: 0.1rem !important;
+}
+</style>
+
 <script>
-import { register } from 'vue-advanced-chat';
-register();
+import { PrettyChatWindow } from 'react-chat-engine-pretty';
 
-// Or if you used CDN import
-// window['vue-advanced-chat'].register()
-
+import { applyReactInVue } from 'veaury';
+import { useAccountStore } from '../store/account';
 export default {
+    setup() {
+        const accountStore = useAccountStore();
+        return { accountStore };
+    },
     data() {
         return {
-            currentUserId: '1234',
-            rooms: [],
-            messages: [],
-            roomActions: [
-                { name: 'inviteUser', title: 'Invite User' },
-                { name: 'removeUser', title: 'Remove User' },
-                { name: 'deleteRoom', title: 'Delete Room' },
-            ],
+            projectId: import.meta.env.VITE_CHAT_ENGINE_PROJECT_ID,
+            username: '@' + this.accountStore.account.username,
+            secret: this.accountStore.account._id,
         };
+    },
+    components: {
+        PrettyChatWindow: applyReactInVue(PrettyChatWindow),
     },
 };
 </script>

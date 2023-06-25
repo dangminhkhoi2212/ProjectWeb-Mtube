@@ -1,15 +1,21 @@
 <template>
-    <div v-if="account" class="px-md-5" style="height: 90vh">
+    <div
+        v-if="account && accountStore.account"
+        class="px-md-5 position-relative vl-parent"
+        style="height: 90vh">
         <div
             class="px-md-5 position-relative"
-            style="height: clamp(200px, 20vh, 300px)"
+            style="height: 40vh"
             v-if="account.cover"
             :style="{
-                backgroundImage: `url(${account.cover.url})`,
+                backgroundImage: `url(${coverUrl})`,
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
             }">
             <div class="position-absolute bottom-0 col-12 mb-2">
                 <div
-                    class="col-12 col-md-5 d-flex align-items-center gap-4 p-3 rounded-3"
+                    class="col-12 col-md-8 col-xl-4 d-flex align-items-center gap-4 p-3 rounded-3"
                     style="
                         backdrop-filter: blur(50px);
                         /* background-color: var(--violet_80); */
@@ -45,39 +51,47 @@
                     </div>
                 </div>
             </div>
+            <button
+                v-if="!isUpdateCover"
+                class="position-absolute bottom-0 end-0 p-3 rounded-3 m-3"
+                style="background-color: var(--btn)"
+                @click="handleButtonClick">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            <div v-else class="position-absolute bottom-0 end-0">
+                <i
+                    role="button"
+                    class="p-3 rounded-3 fa-solid fa-xmark"
+                    style="background-color: var(--btn)"
+                    @click="handleCancelFile"></i>
+                <i
+                    role="button"
+                    class="p-3 m-3 rounded-3 fa-solid fa-cloud-arrow-up"
+                    style="background-color: var(--btn)"
+                    @click="updateCover"></i>
+            </div>
+            <input
+                class="d-none"
+                type="file"
+                ref="file"
+                accept="image/png, image/jpeg"
+                @change="onFileSelected"
+                @cancel="handleCancelFile" />
         </div>
-        <div class="py-4 vl-parent">
+        <div class="py-4">
             <div class="d-flex">
                 <div
+                    v-for="field in navFields"
+                    :key="field"
                     role="button"
                     class="btn fs-5"
-                    :class="{ active_btn: showVideos }"
-                    @click="
-                        () => {
-                            showVideos = true;
-                            showAbout = false;
-                        }
-                    ">
-                    Videos
-                    <span v-if="account.myVideos"
-                        >({{ account.myVideos.length.toString() }})</span
-                    >
-                </div>
-                <div
-                    role="button"
-                    class="btn fs-5"
-                    :class="{ active_btn: showAbout }"
-                    @click="
-                        () => {
-                            showAbout = true;
-                            showVideos = false;
-                        }
-                    ">
-                    About
+                    :class="{ active_btn: activeField === field }"
+                    @click="changeNavFields(field)">
+                    {{ field }}
                 </div>
             </div>
             <hr class="m-0 p-0" />
-            <div v-if="showVideos">
+            <div v-if="activeField === 'Videos'">
                 <VideoCard
                     :key="account.myVideos"
                     class="customArtplayer"
@@ -86,7 +100,8 @@
                     :option="option"
                     @removeMyVideo="removeMyVideo"></VideoCard>
             </div>
-            <div v-if="showAbout" class="" :key="account">
+
+            <div v-if="activeField === 'About'" class="" :key="account">
                 <div class="row row-cols-1 row-cols-md-3 py-3">
                     <div class="col">
                         <h5>Joined</h5>
@@ -152,6 +167,7 @@
                             type="text"
                             v-model="account.media.tiktok" />
                     </div>
+                    <hr class="my-2" />
                 </div>
                 <div class="d-flex justify-content-center gap-2 mt-4">
                     <button
@@ -191,15 +207,52 @@
                     </button>
                 </div>
             </div>
-            <Loading
-                v-model:active="loading.isLoading"
-                :can-cancel="loading.onCancel"
-                :is-full-page="loading.fullPage"
-                :opacity="0.5"
-                backgroundColor="#170f23 !important"
-                color="#c6bcd3"
-                loader="bars" />
+            <div v-if="activeField === 'Settings'" class="col col-sm-6">
+                <div
+                    class="d-flex justify-content-between align-items-center py-2 mt-2">
+                    <h5>Edit Account</h5>
+                    <button class="btn">
+                        <RouterLink :to="{ name: 'editprofile' }">
+                            Go to Edit
+                        </RouterLink>
+                    </button>
+                </div>
+                <hr />
+                <div
+                    class="d-flex justify-content-between align-items-center py-2">
+                    <h5>Delete Account</h5>
+                    <button class="btn" @click="isDeleteAccount = true">
+                        Delete
+                    </button>
+                </div>
+                <hr />
+            </div>
         </div>
+        <div
+            v-if="isDeleteAccount"
+            class="d-flex flex-column align-items-center gap-3 position-absolute top-50 start-50 translate-middle p-5 rounded-3"
+            style="
+                background-color: var(--violet_90);
+                z-index: var(--z_index_nav);
+            ">
+            <h5>Confirm your password</h5>
+            <input type="password" class="p-2" v-model="password" />
+            <div class="d-flex justify-content-center gap-4">
+                <button class="btn" @click="isDeleteAccount = false">
+                    Cancle
+                </button>
+                <button class="btn" @click="deleteAccount">Delete</button>
+            </div>
+        </div>
+        <div v-if="isDeleteAccount" class="space"></div>
+        <Loading
+            v-model:active="loading.isLoading"
+            :can-cancel="loading.onCancel"
+            :is-full-page="loading.fullPage"
+            :opacity="0.5"
+            backgroundColor="#170f23 !important"
+            color="#c6bcd3"
+            loader="bars" />
     </div>
 </template>
 
@@ -211,7 +264,7 @@ import { useAccountStore } from '../store/account';
 import { convertISODate, convertISOTime } from '../utils/date.utils';
 import alertUtil from '../utils/myAlert';
 import Loading from 'vue-loading-overlay';
-
+import { deleteRest } from '../services/ChatEngine';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -230,12 +283,18 @@ export default {
                 height: '180px',
                 borderRadius: 'var(--border_radius_video)',
             },
-            showVideos: true,
-            showAbout: false,
+            newCover: null,
+            coverUrl: '',
+            oldCoverUrl: '',
+            navFields: ['Videos', 'About', 'Settings'],
+            activeField: 'Videos',
             totalFollowers: [],
             joined: '',
+            password: null,
             isFollow: false,
             isEditDetails: false,
+            isUpdateCover: false,
+            isDeleteAccount: false,
             loading: {
                 isLoading: false,
                 fullPage: false,
@@ -249,10 +308,13 @@ export default {
             try {
                 this.account = await accountService.getAccount(this.accountId);
 
+                this.coverUrl = this.account.cover.url;
+                this.oldCoverUrl = this.account.cover.url;
+                this.totalFollowers = this.account.followers;
+
                 this.formatDateVideo();
                 this.checkFollow();
                 this.formatJoined();
-                this.totalFollowers = this.account.followers;
             } catch (error) {
                 console.log(
                     '🚀 ~ file: Profile.vue:31 ~ getProfile ~ error:',
@@ -355,6 +417,75 @@ export default {
             } catch (error) {
                 this.loading.isLoading = false;
                 alertUtil.myAlert('Error!', "Don't update detail this video! ");
+            }
+        },
+        handleButtonClick() {
+            this.$refs.file.click();
+            this.isUpdateCover = true;
+        },
+        onFileSelected(event) {
+            if (event.target.files[0]) {
+                this.newCover = event.target.files[0];
+                URL.revokeObjectURL(this.newCover);
+                this.coverUrl = URL.createObjectURL(event.target.files[0]);
+            }
+        },
+        handleCancelFile() {
+            this.isUpdateCover = false;
+            this.coverUrl = this.oldCoverUrl;
+        },
+        async updateCover() {
+            try {
+                this.loading.isLoading = true;
+                this.isUpdateCover = false;
+                const form = new FormData();
+                form.append('cover', this.newCover);
+                this.account = await accountService.updateCover(
+                    this.accountStore.account._id,
+                    form,
+                );
+                this.formatDateVideo();
+                this.checkFollow();
+
+                URL.revokeObjectURL(this.coverUrl);
+
+                this.loading.isLoading = false;
+            } catch (error) {
+                this.loading.isLoading = true;
+
+                alertUtil.myAlert('error', 'Error while updating');
+            }
+        },
+        changeNavFields(fieldActive) {
+            this.activeField = fieldActive;
+        },
+        async deleteAccount() {
+            try {
+                this.loading.isLoading = true;
+                if (this.isDeleteAccount && this.password)
+                    await accountService.delete(
+                        this.accountStore.account._id,
+                        this.password,
+                    );
+                //delete in ChatEngine
+                await deleteRest(
+                    this.accountStore.account.username,
+                    this.accountStore.account._id,
+                );
+
+                this.accountStore.account = null;
+
+                localStorage.clear();
+
+                this.loading.isLoading = false;
+                this.$router.push({ name: 'login' });
+            } catch (error) {
+                this.loading.isLoading = false;
+
+                console.log(
+                    '🚀 ~ file: Profile.vue:470 ~ deleteAccount ~ error:',
+                    error,
+                );
             }
         },
     },

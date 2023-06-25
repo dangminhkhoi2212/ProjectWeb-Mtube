@@ -27,21 +27,28 @@ router
 // ---------------------------------------------//
 
 router
-    .route('/:id')
-    .get(accountController.findById)
-    .put(verifyToken, multer.single('avatar'), accountController.updateAccount)
-    .delete(accountController.deleteAccount);
-
-// ---------------------------------------------//
-
-router
     .route('/editDetail/:accountId')
     .put(verifyToken, accountController.editDetail);
+
+// ---------------------------------------------//
 
 router.route('/login').post(accountController.login);
 
 // ---------------------------------------------//
 
+router
+    .route('/updateCover/:accountId')
+    .put(verifyToken, multer.single('cover'), accountController.updateCover);
+
+// ---------------------------------------------//
+
+router
+    .route('/:id')
+    .post(verifyToken, accountController.deleteAccount)
+    .get(accountController.findById)
+    .put(verifyToken, multer.single('avatar'), accountController.updateAccount);
+
+// ---------------------------------------------//
 router
     .route('/')
     .get(accountController.findAll)

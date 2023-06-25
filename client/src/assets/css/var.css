@@ -24,4 +24,5 @@
     --space_cover: #00000073;
     --border_radius_video: 15px;
     --box_shadow_input: #4e2a7d8d;
+    --z_index_nav: 1000;
 }

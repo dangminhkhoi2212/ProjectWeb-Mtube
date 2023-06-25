@@ -113,6 +113,7 @@ import { useAccountStore } from '../store/account';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import { useExtraStore } from '../store/extra';
+import { signupRest, updateAvatarRest } from '../services/ChatEngine';
 
 export default {
     setup() {
@@ -178,10 +179,26 @@ export default {
                 form.append('email', this.account.email);
                 if (this.urlImage) form.append('avatar', this.account.image);
 
-                await accountService.create(form);
+                const newAccount = await accountService.create(form);
+
+                //Create account in ChatEngine.io
+                await signupRest(
+                    '@' + this.account.username,
+                    newAccount._id,
+                    this.account.email,
+                    this.account.name,
+                );
+                if (this.account.image)
+                    await updateAvatarRest(
+                        this.account.username,
+                        newAccount._id,
+                        this.account.image,
+                    );
+
                 this.isLoading = false;
                 this.extraStore.myAlert('success', 'Create success! 🥳');
                 URL.revokeObjectURL(this.urlImage);
+
                 this.$router.push({ name: 'login' });
             } catch (error) {
                 console.log(
@@ -196,6 +213,7 @@ export default {
             }
         },
     },
+    mounted() {},
 };
 </script>
 <style scoped>

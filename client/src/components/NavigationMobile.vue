@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex align-items-center gap-4 gap-sm-5">
+    <div class="d-flex align-items-center gap-2">
         <div class="">
             <i
                 v-if="!isShow"
@@ -12,15 +12,13 @@
                 @click="isShow = !isShow"
                 class="fs-4 fa-solid fa-x"></i>
         </div>
-        <div
-            v-if="!isShow"
-            id="logo"
-            class=""
-            style="width: 35px; height: 40px">
+        <div id="logo" class="" style="width: 35px; height: 40px">
             <RouterLink
                 :to="{ name: 'home' }"
-                class="d-flex align-items-center gap-2 logo">
+                class="d-flex align-items-center gap-2 mx-1 logo"
+                style="background-color: transparent !important">
                 <img
+                    class=""
                     style="width: 40px; height: 40px"
                     src="../assets/images/logo.png"
                     alt="" />
@@ -28,19 +26,11 @@
             </RouterLink>
         </div>
     </div>
-    <div
-        v-if="isShow"
-        @click="isShow = !isShow"
-        class="vw-100 p-0 m-0 position-absolute"
-        style="
-            top: 69px;
-
-            background-color: var(--space_cover);
-            height: calc(100vh - var(--width_header));
-        "></div>
+    <div v-if="isShow" @click="isShow = !isShow" class="space"></div>
     <Navigation
-        class="d-sm-flex col-sm-2 nav z-10000 p-3"
-        :class="{ active: isShow }"></Navigation>
+        class="d-sm-flex col-sm-2 nav p-3"
+        :class="{ active: isShow }"
+        style="z-index: var(--z_index_nav)"></Navigation>
 </template>
 
 <script>

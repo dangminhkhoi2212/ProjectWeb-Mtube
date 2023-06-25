@@ -65,11 +65,11 @@ export default {
     },
     methods: {},
     async mounted() {
-        if (this.accountStore.account === null)
+        if (this.accountStore.account === null && localStorage.getItem('id'))
             await this.accountStore.getAccount();
         setTimeout(() => {
             this.isLoading = false;
-        }, 500);
+        }, 1000);
     },
 };
 </script>

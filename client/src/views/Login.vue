@@ -51,6 +51,14 @@
                 </div>
             </div>
         </div>
+        <Loading
+            v-model:active="loading.isLoading"
+            :can-cancel="loading.onCancel"
+            :is-full-page="loading.fullPage"
+            :opacity="1"
+            backgroundColor="#170f23 !important"
+            color="#c6bcd3"
+            loader="bars" />
     </div>
 </template>
 <script>
@@ -58,6 +66,8 @@ import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
 import alertUtil from '../utils/myAlert';
+import { loginRest } from '../services/ChatEngine';
+import Loading from 'vue-loading-overlay';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -70,12 +80,19 @@ export default {
             password: '',
             account: Object,
             message: '',
+            loading: {
+                isLoading: false,
+                isFullPage: true,
+                onCancel: false,
+            },
         };
     },
-    components: {},
+    components: { Loading },
     methods: {
         async gotoHome() {
             try {
+                this.loading.isLoading = true;
+
                 this.account = await accountService.getLogin(
                     this.username,
                     this.password,
@@ -88,8 +105,14 @@ export default {
                 localStorage.setItem('id', this.account._id);
                 this.accountStore.account = this.account;
                 localStorage.setItem('token', this.account.token);
+
+                // Login in ChatEngine
+                await loginRest('@' + this.username, this.account._id);
+                this.loading.isLoading = false;
                 this.$router.push({ name: 'home' });
             } catch (err) {
+                this.loading.isLoading = false;
+
                 alertUtil.myAlert('error', err.response.data.message);
             }
         },

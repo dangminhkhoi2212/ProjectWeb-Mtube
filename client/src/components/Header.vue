@@ -4,16 +4,12 @@
         :class="isDetailPage ? 'fixed-top' : 'sticky-top'"
         style="min-height: 70px">
         <div
-            class="row justify-content-evenly align-items-center myborder"
+            class="d-flex align-items-center justify-content-around myborder"
             style="background-color: var(--violet_100)">
-            <div
-                class="col-2 ms-3"
-                :class="
-                    this.$route.name === 'detail' ? 'd-inline' : 'd-sm-none'
-                ">
+            <div class="ms-3" :class="isDetailPage ? 'd-inline' : 'd-sm-none'">
                 <navigation-mobile></navigation-mobile>
             </div>
-            <div class="container my-3 col-6">
+            <div class="col-6 my-3">
                 <div class="d-flex">
                     <input
                         class="me-2 p-2 rounded-2 border border-0 text-white"
@@ -35,7 +31,7 @@
                 </div>
             </div>
             <div
-                class="d-none d-sm-flex gap-sm-3 align-items-center justify-content-center account col-3"
+                class="d-none d-sm-flex gap-sm-3 align-items-center justify-content-center account"
                 v-if="this.accountStore.account">
                 <div class="p-0 m-0" style="">
                     <router-link
