@@ -16,15 +16,16 @@ require('dotenv').config();
 
 class Methods {
     async findAll(req, res, next) {
-        var documents = [];
-        const namerequire = req.query.name;
+        var data = [];
+        const searchCriteria = req.query.searchCriteria;
+
         try {
-            if (namerequire) {
-                documents = await Account.find({
-                    name: { $regex: `${namerequire}`, $options: 'i' },
-                }).populate('myVideos');
+            if (searchCriteria) {
+                data = await Account.find({
+                    name: { $regex: `${searchCriteria}`, $options: 'i' },
+                }).select('avatar name followers');
             } else {
-                documents = await Account.find({}).populate('myVideos');
+                data = await Account.find({}).select('avatar name followers');
             }
         } catch (error) {
             return next(
@@ -34,7 +35,7 @@ class Methods {
                 ),
             );
         }
-        return res.send(documents);
+        return res.send(data);
     }
     async getFavorite(req, res, next) {
         try {
@@ -52,8 +53,8 @@ class Methods {
     }
     async checkAccountExist(id = null, username = null, email = null) {
         try {
-            var check;
-            if (username) {
+            var check = [];
+            if (username && email) {
                 check = await Account.find({
                     $and: [
                         { _id: { $ne: id } },
@@ -65,7 +66,10 @@ class Methods {
             }
             return check.length !== 0 ? true : false;
         } catch (error) {
-            return next(new ApiError(400, error.message));
+            console.log(
+                '🚀 ~ file: account.controller.js:68 ~ Methods ~ checkAccountExist ~ error:',
+                error,
+            );
         }
     }
 
@@ -166,7 +170,10 @@ class Methods {
                 process.env.ACCESS_TOKEN_SECRET,
             );
             account.token = token;
-            const result = await account.save();
+            const result = await Account.findByIdAndUpdate(
+                account._id,
+                account,
+            ).select('-password');
 
             return res.send(result);
         } catch (error) {
@@ -321,51 +328,86 @@ class Methods {
     async updateAccount(req, res, next) {
         try {
             const id = req.params.id;
-            const { name, username, email, password } = req.body;
+            const data = req.body;
             const file = req.file;
             const account = await AccountModel.findById(id);
+            const methods = new Methods();
+            const selectImage = req.body.selectImage;
 
-            if (name && !name.trim()) {
+            //handle name, username, email
+            if (
+                'name' in data && // check field existed in data
+                'username' in data && // check field existed in data
+                'email' in data && // check field existed in data
+                !data.name &&
+                !data.username &&
+                !data.email
+            ) {
                 return res
-                    .status(400)
-                    .json({ message: 'Name cannot be empty' });
+                    .status(403)
+                    .json({ message: "Name, username, email can't be empty" });
             }
 
             if (
-                (name || email) &&
-                (account.username !== username || account.email !== email)
+                account.username !== data.username ||
+                account.email !== data.email
             ) {
-                if (await methods.checkAccountExist(id, username, email)) {
+                if (
+                    await methods.checkAccountExist(
+                        id,
+                        data.username,
+                        data.email,
+                    )
+                ) {
                     return res
-                        .status(400)
-                        .send('Username or email already exists');
+                        .status(403)
+                        .json({ message: 'Username or email already exists' });
                 }
             }
-
+            //handle avatar and cover
             if (file) {
-                if (account.avatar.public_id)
-                    await deleteFile(account.avatar.public_id, 'imgae');
-
                 const result = await uploadToCloudinary(
                     file.path,
                     'image',
                     `accounts/${account._id}`,
                 );
-
-                account.avatar = {
-                    public_id: result.public_id,
-                    url: result.url,
-                };
-            } else if (password) {
-                const hashedPassword = await bcrypt.hash(password, 10);
-                account.password = hashedPassword;
+                if (selectImage === 'avatar') {
+                    if (account.avatar.public_id)
+                        await deleteFile(account.avatar.public_id, 'image');
+                    data.avatar = {};
+                    data.avatar.public_id = result.public_id;
+                    data.avatar.url = result.url;
+                }
+                if (selectImage === 'cover') {
+                    if (account.cover.public_id)
+                        await deleteFile(account.cover.public_id, 'image');
+                    data.cover = {};
+                    data.cover.public_id = result.public_id;
+                    data.cover.url = result.url;
+                }
             }
-            await account.save();
+            //handle password
+            if (data.password) {
+                const hashedPassword = await bcrypt.hash(data.password, 10);
+                data.password = hashedPassword;
+            }
 
-            return res.send(account);
+            const result = await Account.findByIdAndUpdate(
+                id,
+                { $set: data },
+                {
+                    new: true,
+                },
+            )
+                .select('-password')
+                .populate({
+                    path: 'myVideos',
+                    populate: { path: 'accountId', select: 'avatar' },
+                });
+
+            return res.send(result);
         } catch (error) {
-            console.log(error);
-            return res.send(error);
+            next(new ApiError(error.code, error));
         }
     }
 
@@ -414,7 +456,7 @@ class Methods {
 
                 res.send('Deleted successfully');
             } else {
-                throw new ApiError(400, 'Passwords do not match');
+                next(new ApiError(400, 'Passwords do not match'));
             }
         } catch (error) {
             next(new ApiError(500, error));
@@ -455,59 +497,6 @@ class Methods {
                 return res.send(result);
             }
             res.send("Can't follow yourself");
-        } catch (error) {
-            next(new ApiError(500, error));
-        }
-    }
-    async editDetail(req, res, next) {
-        try {
-            const accountId = req.params.accountId;
-            const { biography, media } = req.body;
-
-            const result = await Account.findByIdAndUpdate(
-                accountId,
-                {
-                    biography,
-                    media,
-                },
-                { new: true },
-            )
-                .select('-password -token -username -email')
-                .populate({
-                    path: 'myVideos',
-                    populate: { path: 'accountId', select: 'avatar' },
-                });
-
-            res.send(result);
-        } catch (error) {
-            next(new ApiError(500, error));
-        }
-    }
-    async updateCover(req, res, next) {
-        try {
-            const file = req.file;
-            const accountId = req.params.accountId;
-            if (file) {
-                const account = await Account.findById(accountId);
-                if (account.cover.public_id)
-                    deleteFile(account.cover.public_id, 'image');
-                const { public_id, url } = await uploadToCloudinary(
-                    file.path,
-                    'image',
-                    `accounts/${accountId}`,
-                );
-                const reuslt = await Account.findByIdAndUpdate(
-                    accountId,
-                    { cover: { public_id, url } },
-                    { new: true },
-                )
-                    .select('-password -token -username -email')
-                    .populate({
-                        path: 'myVideos',
-                        populate: { path: 'accountId', select: 'avatar' },
-                    });
-                res.send(reuslt);
-            }
         } catch (error) {
             next(new ApiError(500, error));
         }

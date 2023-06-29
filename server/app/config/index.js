@@ -3,7 +3,9 @@ const config = {
         port: process.env.PORT || 3000,
     },
     db: {
-        url: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/project',
+        url:
+            process.env.MONGODB_URI ||
+            'mongodb+srv://kkhoi600:dangminhkhoi2212@project.rflxno2.mongodb.net/Mtube',
     },
 };
 module.exports = config;

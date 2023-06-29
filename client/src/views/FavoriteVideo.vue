@@ -23,6 +23,7 @@
                 :videos="videos"
                 :option="option"
                 :style="style"
+                class="customArtplayer"
                 @removeFavoriteVideo="removeFavoriteVideo"></VideoCard>
             <Loading
                 v-model:active="loading.isLoading"
@@ -140,7 +141,7 @@ export default {
                     this.loading.isLoading = false;
                 } catch (error) {
                     alertUtil.myAlert(
-                        'Error!',
+                        'error',
                         "Don't delete this all videos ! ",
                     );
                     this.loading.isLoading = false;

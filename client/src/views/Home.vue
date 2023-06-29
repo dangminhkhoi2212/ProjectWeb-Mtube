@@ -1,15 +1,21 @@
 <template>
-    <section id="main">
+    <section class="vl-parent">
         <Carousel v-model="categoryActive"></Carousel>
-        <div
-            class="container px-1 px-lg-5"
-            style="height: 82vh; overflow-y: auto">
+        <div class="container px-1 px-lg-5" style="overflow-y: auto">
             <VideoCard
                 class="customArtplayer"
                 :videos="categoryVideos"
                 :style="style"
                 :option="option"></VideoCard>
         </div>
+        <loading
+            v-model:active="loading.isLoading"
+            :can-cancel="false"
+            backgroundColor="#170f23 !important"
+            color="#c6bcd3"
+            :opacity="0.6"
+            loader="bars"
+            :is-full-page="loading.fullPage" />
     </section>
 </template>
 <script>
@@ -23,6 +29,7 @@ import videoService from '../services/video.service';
 import VideoCard from '../components/VideoCard.vue';
 import Artplayer from '../components/Artplayer.vue';
 
+import Loading from 'vue-loading-overlay';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -33,6 +40,7 @@ export default {
         Carousel,
         VideoCard,
         Artplayer,
+        Loading,
     },
 
     data() {
@@ -46,6 +54,11 @@ export default {
                 height: '180px',
                 borderRadius: 'var(--border_radius_video)',
             },
+            loading: {
+                isLoading: true,
+                fullPage: false,
+                onCancel: false,
+            },
         };
     },
     watch: {
@@ -55,10 +68,6 @@ export default {
                     (video) => video.category === this.categoryActive,
                 );
             else this.categoryVideos = this.videos;
-            console.log(
-                '🚀 ~ file: Home.vue:53 ~ mounted ~ this.videos:',
-                this.categoryVideos,
-            );
         },
     },
     methods: {
@@ -74,20 +83,21 @@ export default {
                 );
             }
         },
+        formatDateVideo() {
+            this.videos = this.videos.map((video) => {
+                const time = convertISODate(video.publishedAt);
+                return { ...video, publishedAt: time };
+            });
+        },
     },
     computed: {},
-    async mounted() {
+    async created() {
+        this.loading.isLoading = true;
         await this.getAllVideos();
+        this.formatDateVideo();
 
-        this.videos = this.videos.map((video) => {
-            const time = convertISODate(video.publishedAt);
-            return { ...video, publishedAt: time };
-        });
         this.categoryVideos = this.videos;
-        console.log(
-            '🚀 ~ file: Home.vue:87 ~ mounted ~ this.categoryVideos:',
-            this.categoryVideos,
-        );
+        this.loading.isLoading = false;
     },
 };
 </script>

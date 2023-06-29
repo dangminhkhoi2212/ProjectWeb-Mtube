@@ -17,6 +17,7 @@
     "jquery": "^3.6.3",
     "pinia": "^2.1.4",
     "react-chat-engine-pretty": "^0.1.8",
+    "socket.io-client": "^4.7.0",
     "sweetalert2": "^11.7.3",
     "veaury": "^2.3.12",
     "vue": "^3.3.4",

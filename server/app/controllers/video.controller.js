@@ -9,19 +9,36 @@ const AccountModel = require('../models/Account.model');
 
 class Methods {
     async findAll(req, res, next) {
-        await VideoModel.find({})
-            .populate('accountId', 'avatar')
-            .then((data) => {
-                res.send(data);
-            })
-            .catch((error) =>
-                next(
-                    new ApiError(
-                        500,
-                        'An error occurent while retrieving contacts',
-                    ),
-                ),
+        try {
+            const searchCriteria = req.query.searchCriteria;
+            console.log(
+                '🚀 ~ file: video.controller.js:14 ~ Methods ~ findAll ~ searchCriteria:',
+                searchCriteria,
             );
+            var result = [];
+            var option = {
+                path: 'accountId',
+                select: ['avatar', 'name'],
+            };
+            if (searchCriteria) {
+                result = await VideoModel.find({
+                    $or: [
+                        {
+                            channelTitle: {
+                                $regex: searchCriteria,
+                                $options: 'i',
+                            },
+                        },
+                        { title: { $regex: searchCriteria, $options: 'i' } },
+                        { tags: { $regex: searchCriteria, $options: 'i' } },
+                        { category: { $regex: searchCriteria, $options: 'i' } },
+                    ],
+                }).populate(option);
+            } else result = await VideoModel.find().populate(option);
+            res.send(result);
+        } catch (error) {
+            next(new ApiError(500, error.message));
+        }
     }
     async create(req, res, next) {
         try {
@@ -64,11 +81,11 @@ class Methods {
     }
     async findOne(req, res, next) {
         try {
-            const id = req.params.id;
-            const result = await VideoModel.findById(id).populate(
-                'accountId',
-                'avatar',
-            );
+            const id = req.params.videoId;
+            const result = await VideoModel.findById(id).populate({
+                path: 'accountId',
+                select: ['name', 'avatar', 'followers'],
+            });
             res.send(result);
         } catch (error) {
             next(new ApiError(500, error.message));
@@ -76,13 +93,48 @@ class Methods {
     }
     async update(req, res, next) {
         try {
-            const dataUpdate = req.body;
-            await VideoModel.findByIdAndUpdate(req.params.id, {
-                $set: dataUpdate,
-            });
-            res.send('Updated successfully');
+            const videoId = req.params.videoId;
+
+            const data = req.body;
+            console.log(
+                '🚀 ~ file: video.controller.js:100 ~ Methods ~ update ~ data:',
+                data,
+                videoId,
+            );
+            var result = {};
+            const options = {
+                path: 'accountId',
+                select: ['name', 'avatar', 'followers'],
+            };
+            if ('like' in data) {
+                if (data.like === true)
+                    result = await VideoModel.findByIdAndUpdate(
+                        videoId,
+                        {
+                            $push: { usersLike: data.accountId },
+                        },
+                        { new: true },
+                    ).populate(options);
+                else
+                    result = await VideoModel.findByIdAndUpdate(
+                        videoId,
+                        {
+                            $pull: { usersLike: data.accountId },
+                        },
+                        { new: true },
+                    ).populate(options);
+            } else {
+                result = await VideoModel.findByIdAndUpdate(
+                    videoId,
+                    {
+                        $set: data,
+                    },
+                    { new: true },
+                ).populate('accountId', ['avatar', 'name', 'followers']);
+            }
+            res.send(result);
         } catch (error) {
-            next(new ApiError(404, 'Music video not found'));
+            next(new ApiError(404, error.message));
         }
     }
 
@@ -103,56 +155,6 @@ class Methods {
             res.send(`Delete ${req.params.videoId} success`);
         } catch (error) {
             next(new ApiError(err.code || 500, err));
-        }
-    }
-
-    async addUserLike(req, res, next) {
-        const id = req.params.id;
-        const videoId = req.params.videoId;
-        try {
-            const newVideoUpdate = await VideoModel.findById(videoId);
-            const usersLike = newVideoUpdate.usersLike;
-            var liked = false;
-            for (let i = 0; i < usersLike.length; i++) {
-                let userLiked = JSON.parse(JSON.stringify(usersLike[i]));
-                if (userLiked === id) {
-                    liked = true;
-                    break;
-                }
-            }
-            if (!liked) {
-                newVideoUpdate.usersLike.push(id);
-                newVideoUpdate.likeCount++;
-            }
-            await newVideoUpdate.save().then((result) => res.send(result));
-        } catch (err) {
-            next(new ApiError(err.code || 500, err));
-        }
-    }
-    async removeUserLike(req, res, next) {
-        const id = req.params.id;
-        const videoId = req.params.videoId;
-        try {
-            const newVideoUpdate = await VideoModel.findById(videoId);
-            const usersLike = newVideoUpdate.usersLike;
-            var liked = false;
-            for (let i = 0; i < usersLike.length; i++) {
-                let userLiked = JSON.parse(JSON.stringify(usersLike[i]));
-                if (userLiked === id) {
-                    liked = true;
-                    break;
-                }
-            }
-            if (liked) {
-                var index = usersLike.indexOf(id);
-                if (index !== -1) {
-                    newVideoUpdate.usersLike.splice(index, 1);
-                }
-                newVideoUpdate.likeCount--;
-            }
-            await newVideoUpdate.save().then((result) => res.send(result));
-        } catch (err) {
-            next(new ApiError('500', 'Dont remove userlike'));
         }
     }
 }

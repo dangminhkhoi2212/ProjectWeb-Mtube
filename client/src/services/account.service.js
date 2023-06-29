@@ -12,8 +12,8 @@ class AccountService {
     constructor(baseUrl = '/account') {
         this.api = createApiClient(baseUrl);
     }
-    async getAll() {
-        return (await this.api.get('/')).data;
+    async getAll(searchCriteria) {
+        return (await this.api.get('/', { params: { searchCriteria } })).data;
     }
     async create(data) {
         return (await this.api.post('/', data)).data;

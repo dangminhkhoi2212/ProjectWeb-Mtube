@@ -15,7 +15,6 @@
                             label="Username"
                             type="text"
                             validation="required|length:5"
-                            validation-visibility="live"
                             placeholder="Your username"
                             v-model="username" />
                         <FormKit
@@ -25,7 +24,6 @@
                             label="Password"
                             help="Enter a new password"
                             validation="required"
-                            validation-visibility="live"
                             placeholder="Your password"
                             v-model="password" />
                         <button
@@ -78,7 +76,7 @@ export default {
         return {
             username: '',
             password: '',
-            account: Object,
+            account: {},
             message: '',
             loading: {
                 isLoading: false,
@@ -116,6 +114,9 @@ export default {
                 alertUtil.myAlert('error', err.response.data.message);
             }
         },
+    },
+    mounted() {
+        this.accountStore.removeAccount();
     },
 };
 </script>

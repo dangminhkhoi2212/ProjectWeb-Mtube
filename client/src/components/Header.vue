@@ -1,15 +1,25 @@
 <template>
     <div
-        class="d-sm-block"
-        :class="isDetailPage ? 'fixed-top' : 'sticky-top'"
-        style="min-height: 70px">
+        class=""
+        style="
+            height: var(--height_header);
+            background-color: var(--background_main);
+            z-index: calc(var(--z_index_nav) - 1);
+        ">
         <div
-            class="d-flex align-items-center justify-content-around myborder"
-            style="background-color: var(--violet_100)">
-            <div class="ms-3" :class="isDetailPage ? 'd-inline' : 'd-sm-none'">
+            class="d-flex align-items-center justify-content-between justify-content-sm-around myborder mx-2"
+            style="
+                background-color: var(--violet_100);
+                max-height: 70px !important;
+            ">
+            <div
+                class="ms-3"
+                :class="
+                    this.$route.name == 'detail' ? 'd-inline' : 'd-sm-none'
+                ">
                 <navigation-mobile></navigation-mobile>
             </div>
-            <div class="col-6 my-3">
+            <div class="col-8 col-sm-6 my-3">
                 <div class="d-flex">
                     <input
                         class="me-2 p-2 rounded-2 border border-0 text-white"
@@ -30,50 +40,10 @@
                     </button>
                 </div>
             </div>
-            <div
-                class="d-none d-sm-flex gap-sm-3 align-items-center justify-content-center account"
-                v-if="this.accountStore.account">
-                <div class="p-0 m-0" style="">
-                    <router-link
-                        :to="{
-                            name: 'profile',
-                            params: {
-                                accountId: this.accountStore.account._id,
-                            },
-                        }">
-                        <li class="dropdown-item" style="color: var(--text)">
-                            <avatar-circle
-                                :src="
-                                    this.accountStore.account.avatar.url
-                                "></avatar-circle>
-                        </li>
-                    </router-link>
-                </div>
-                <div class="dropdown">
-                    <button
-                        class="dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="true"></button>
-                    <ul class="dropdown-menu">
-                        <router-link :to="{ name: 'editprofile' }"
-                            ><li
-                                class="dropdown-item"
-                                style="color: var(--text)">
-                                Edit Profile
-                            </li>
-                        </router-link>
-                        <router-link :to="{ name: 'login' }"
-                            ><li
-                                @click="removeAccount()"
-                                class="dropdown-item"
-                                style="color: var(--text)">
-                                Log out
-                            </li>
-                        </router-link>
-                    </ul>
-                </div>
-            </div>
+
+            <account-tools
+                class="d-none d-sm-flex"
+                :accountId="accountStore.account._id"></account-tools>
         </div>
     </div>
 </template>
@@ -83,6 +53,7 @@ import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
 import AvatarCircle from './AvatarCircle.vue';
 import NavigationMobile from './NavigationMobile.vue';
+import AccountTools from './AccountTools.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -95,12 +66,12 @@ export default {
             isDetailPage: this.$route.name === 'detail',
         };
     },
-    components: { NavigationMobile, AvatarCircle },
+    components: { NavigationMobile, AvatarCircle, AccountTools },
     methods: {
-        removeAccount() {
-            this.accountStore.account = {};
-            localStorage.removeItem('id');
-            localStorage.removeItem('token');
+        async removeAccount() {
+            localStorage.clear();
+            this.accountStore.account = null;
+            // this.$router.push({ name: 'login' });
         },
         gotoSearch(input) {
             this.videoStore.updateInputSearch(this.inputSearch);

@@ -6,14 +6,19 @@ export const useAccountStore = defineStore('account', {
     getters: {},
     actions: {
         async getAccount() {
-            const id = localStorage.getItem('id');
-            this.account = {};
-            if (!id) return;
             try {
+                const id = localStorage.getItem('id');
+                if (!id) return;
                 this.account = await accountService.getAccount(id);
             } catch (err) {
                 console.log(err);
             }
+        },
+        updateAccount(data) {
+            this.account = data;
+        },
+        removeAccount() {
+            this.account = null;
         },
         checkVideoExist(videoId) {
             const myVideos = JSON.parse(JSON.stringify(this.account.myVideos));

@@ -1,6 +1,6 @@
 <template>
-    <div class="d-flex align-items-center gap-2">
-        <div class="">
+    <div class="d-flex align-items-center gap-3 gap-sm-2 position-relative">
+        <div class="mx-sm-3 col-2">
             <i
                 v-if="!isShow"
                 role="button"
@@ -15,7 +15,7 @@
         <div id="logo" class="" style="width: 35px; height: 40px">
             <RouterLink
                 :to="{ name: 'home' }"
-                class="d-flex align-items-center gap-2 mx-1 logo"
+                class="d-flex align-items-center gap-2"
                 style="background-color: transparent !important">
                 <img
                     class=""
@@ -30,7 +30,8 @@
     <Navigation
         class="d-sm-flex col-sm-2 nav p-3"
         :class="{ active: isShow }"
-        style="z-index: var(--z_index_nav)"></Navigation>
+        style="z-index: var(--z_index_nav)"
+        @click="isShow = false"></Navigation>
 </template>
 
 <script>
@@ -52,7 +53,7 @@ export default {
     position: absolute;
     top: 69px;
     left: 0;
-    height: calc(100vh - var(--width_header));
+    height: calc(100vh - var(--height_header));
     transform: translateX(-300%);
     transition: all 0.2s linear;
 }

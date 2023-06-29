@@ -1,38 +1,29 @@
 <template>
-    <div id="app">
+    <div id="app vl-parent">
         <loading
-            v-model:active="isLoading"
+            v-model:active="loading.isLoading"
             :can-cancel="false"
             backgroundColor="#170f23 !important"
             color="#c6bcd3"
             :opacity="1"
             loader="bars"
-            :is-full-page="fullPage" />
-        <div
-            v-if="this.$route.name !== 'detail'"
-            class="page row fixed-top vh-100"
-            style="overflow-x: hidden; overflow-y: auto">
+            :is-full-page="loading.isfullPage" />
+        <div class="page row vw-100 vh-100" style="overflow-y: auto">
             <Navigation
-                class="d-none d-sm-flex col-sm-2"
-                v-if="accountStore.checkAccount()"></Navigation>
-            <div
-                id="main"
-                class="p-0"
-                :class="
-                    !accountStore.checkAccount() ? 'col-sm-12' : 'col-sm-10'
+                v-if="
+                    this.$route.name !== 'detail' && accountStore.checkAccount()
                 "
-                style="overflow-y: auto">
+                class="d-none d-sm-flex col-sm-2">
+            </Navigation>
+            <div
+                class="p-0 col-12"
+                :class="
+                    this.$route.name === 'detail' ? 'col-sm-12' : 'col-sm-10'
+                ">
                 <Header v-if="accountStore.checkAccount()"></Header>
-                <router-view :key="this.$route" />
-            </div>
-        </div>
-        <div
-            class="page row fixed-top vh-100"
-            style="overflow-x: hidden; overflow-y: auto"
-            v-if="this.$route.name === 'detail'">
-            <div id="main" class="col-sm-12 p-0" style="margin-top: 69px">
-                <Header v-if="accountStore.checkAccount()"></Header>
-                <router-view :key="this.$route" />
+                <div :id="accountStore.checkAccount() ? 'main' : ''">
+                    <router-view :key="this.$route" />
+                </div>
             </div>
         </div>
     </div>
@@ -53,9 +44,11 @@ export default {
     },
     data() {
         return {
-            isLoading: true,
-            fullPage: true,
-            onCancel: false,
+            loading: {
+                isLoading: false,
+                isfullPage: true,
+                onCancel: false,
+            },
         };
     },
     components: {
@@ -64,12 +57,10 @@ export default {
         Header,
     },
     methods: {},
-    async mounted() {
-        if (this.accountStore.account === null && localStorage.getItem('id'))
+    async created() {
+        if (!this.accountStore.checkAccount())
             await this.accountStore.getAccount();
-        setTimeout(() => {
-            this.isLoading = false;
-        }, 1000);
+        this.loading.isLoading = false;
     },
 };
 </script>

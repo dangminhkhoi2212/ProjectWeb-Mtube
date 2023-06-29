@@ -11,7 +11,7 @@ const VideoSchame = new Schema(
         },
         publishedAt: { type: String, required: true },
         channelTitle: { type: String, required: true },
-        title: { type: String, required: true },
+        title: { type: String, required: true, trim: true },
         videoUpload: {
             public_id: { type: String, required: true },
             url: { type: String, required: true },
@@ -20,11 +20,10 @@ const VideoSchame = new Schema(
             type: String,
             default: 'No description',
         },
-        likeCount: { type: Number, default: 0 },
         viewCount: { type: Number, default: 0 },
         image: { type: String },
-        description: { type: String, default: null },
-        tags: { type: Array, default: null },
+        description: { type: String, trim: true },
+        tags: { type: String, trim: true },
         usersLike: [
             {
                 type: Schema.Types.ObjectId,

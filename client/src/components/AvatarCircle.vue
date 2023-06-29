@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="">
         <img class="avatar" :src="src" />
     </div>
 </template>
@@ -14,8 +14,8 @@ export default {
 
 <style>
 img.avatar {
-    width: 48px;
-    height: 48px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     object-fit: cover;
 }

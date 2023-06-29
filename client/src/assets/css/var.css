@@ -1,6 +1,7 @@
 :root {
-    --width_header: 70px;
-    --violet_100: #170f23;
+    --height_header: 70px;
+    --background_main: #170f23;
+    --background_nav: #231b2e;
     --violet_90: #221a2d;
     --violet_80: #221a2d;
     --btn: #4e2a7d;
@@ -19,10 +20,12 @@
     --bg_card_infor: #3c1568;
     --bg_form: #918c8c5d;
     --bg_detail_video: #4e2a7d53;
+    --bg_profile_card: #704a93d6;
     --border: #7f669d;
     --link_hover: #af6ae9;
     --space_cover: #00000073;
     --border_radius_video: 15px;
     --box_shadow_input: #4e2a7d8d;
+    --box_shadow_card: #ffffffbb;
     --z_index_nav: 1000;
 }

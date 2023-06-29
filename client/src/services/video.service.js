@@ -4,8 +4,8 @@ class VideoService {
     constructor(baseUrl = '/video') {
         this.api = createApiClient(baseUrl);
     }
-    async getAll() {
-        return (await this.api.get('/')).data;
+    async getAll(searchCriteria) {
+        return (await this.api.get('/', { params: { searchCriteria } })).data;
     }
     async create(data) {
         return (await this.api.post('/', data)).data;
@@ -16,20 +16,14 @@ class VideoService {
     async get(id) {
         return (await this.api.get(`/${id}`)).data;
     }
-    async update(id, data) {
-        return (await this.api.put(`/${id}`, data)).data;
+    async update(videoId, data) {
+        return (await this.api.put(`/${videoId}`, data)).data;
     }
     async delete(id) {
         return (await this.api.delete(`/${id}`)).data;
     }
-    async like(id, videoId) {
-        return (await this.api.put(`/${id}/${videoId}`)).data;
-    }
-    async unlike(id, videoId) {
-        return (await this.api.delete(`/${id}/${videoId}`)).data;
-    }
-    async addView(videoId) {
-        return (await this.api.put(`/${videoId}`)).data;
+    async handleLike(videoId, accountId) {
+        return (await this.api.put(`/${videoId}`, { accountId })).data;
     }
 }
 export default new VideoService();

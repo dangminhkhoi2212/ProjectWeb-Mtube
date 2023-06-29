@@ -6,10 +6,13 @@ const siteService = require('../services/site');
 const CommentSchame = new Schema(
     {
         videoId: { type: String, required: true },
-        accountId: { type: String, required: true },
-        userName: { type: String, required: true },
-        userImage: { type: String, required: true },
-        textOriginal: { type: String, required: true },
+        accountId: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'Account',
+        },
+
+        textOriginal: { type: String, required: true, max: 3000 },
         publishedAt: { type: String, required: true },
     },
     {

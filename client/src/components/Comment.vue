@@ -1,16 +1,16 @@
 <template>
-    <div class="">
+    <div class="" style="background-color: var(--background_main)">
         <p class="fs-5">{{ comments.length }} comments</p>
         <div class="input-group my-4 pt-md-2 d-flex align-items-center">
             <router-link
-                v-if="commentOfUser.accountId"
+                v-if="accountStore.account._id"
                 :to="{
                     name: 'profile',
-                    params: { accountId: commentOfUser.accountId },
+                    params: { accountId: accountStore.account._id },
                 }">
                 <AvatarCircle
                     class="mx-3"
-                    :src="commentOfUser.userImage"></AvatarCircle>
+                    :src="accountStore.account.avatar.url"></AvatarCircle>
             </router-link>
             <textarea
                 type="text"
@@ -41,10 +41,11 @@
                             v-if="cmt.accountId"
                             :to="{
                                 name: 'profile',
-                                params: { accountId: cmt.accountId },
+                                params: { accountId: cmt.accountId._id },
                             }"
                             class="d-flex gap-2 my-2 align-items-center">
-                            <AvatarCircle :src="cmt.userImage"></AvatarCircle>
+                            <AvatarCircle
+                                :src="cmt.accountId.avatar.url"></AvatarCircle>
                             <div
                                 class="d-flex flex-column flex-sm-row align-items-start justify-content-center gap-sm-3">
                                 <div
@@ -52,11 +53,11 @@
                                     <span
                                         class="fs-sm-5 px-2 rounded-5"
                                         :class="
-                                            cmt.accountId === this.accountId
+                                            cmt.accountId._id === this.accountId
                                                 ? 'isAccount'
                                                 : ''
                                         ">
-                                        {{ cmt.userName }}
+                                        {{ cmt.accountId.name }}
                                     </span>
                                     <span
                                         class="px-2"
@@ -65,7 +66,12 @@
                                             font-size: 0.8rem;
                                             font-weight: 300;
                                         ">
-                                        Subscrible
+                                        {{
+                                            cmt.accountId.followers.length.toLocaleString(
+                                                'en-US',
+                                            )
+                                        }}
+                                        followers
                                     </span>
                                 </div>
                                 <p
@@ -83,13 +89,14 @@
                             {{ cmt.textOriginal }}
                         </p>
                     </div>
+
                     <button
+                        v-if="
+                            accountId === this.accountStore.account._id ||
+                            cmt.accountId._id == accountStore.account._id
+                        "
                         class="rounded-2 p-0 position-absolute top-50 end-0 translate-middle-y"
                         @click="deleteComment(cmt)"
-                        v-show="
-                            cmt.accountId === this.accountStore.account._id ||
-                            admin
-                        "
                         style="height: 30px; width: 40px">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
@@ -112,7 +119,7 @@
 import commentService from '../services/comment.service';
 import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
-import { getToDay, convertISOTime } from '../utils/date.utils';
+import { getToDay, convertISOTime, convertISODate } from '../utils/date.utils';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import Swal from 'sweetalert2';
@@ -125,7 +132,7 @@ export default {
         return { accountStore, extraStore };
     },
     props: {
-        videoId: { type: String },
+        video: { type: Object },
         accountId: { type: String },
     },
     components: { Loading, AvatarCircle },
@@ -136,10 +143,8 @@ export default {
             comments: [],
             content: '',
             commentOfUser: {
-                videoId: this.videoId,
+                videoId: this.video._id,
                 accountId: this.accountStore.account._id,
-                userName: this.accountStore.account.name,
-                userImage: this.accountStore.account.avatar.url,
                 textOriginal: '',
                 publishedAt: getToDay(),
             },
@@ -150,16 +155,15 @@ export default {
     methods: {
         async getComments() {
             try {
-                this.comments = (await commentService.getAll(this.videoId)).map(
-                    (cmt) => {
-                        const time = convertISOTime(cmt.publishedAt);
-                        console.log(
-                            '🚀 ~ file: Comment.vue:145 ~ getComments ~ time:',
-                            time,
-                        );
-                        return { ...cmt, publishedAt: time };
-                    },
-                );
+                this.comments = (
+                    await commentService.getAll(this.video._id)
+                ).map((cmt) => {
+                    const time = `${convertISOTime(
+                        cmt.publishedAt,
+                    )}, ${convertISODate(cmt.publishedAt)}`;
+
+                    return { ...cmt, publishedAt: time };
+                });
             } catch (err) {
                 console.log(err);
             }
@@ -169,8 +173,6 @@ export default {
                 return;
             }
             try {
-                var comment = document.querySelector('#comment');
-                comment.scrollTop = 0;
                 this.isLoading = true;
                 await commentService.create(this.commentOfUser);
                 await this.getComments();
@@ -178,9 +180,16 @@ export default {
                 this.content = '';
 
                 this.keepScroll();
-            } catch (err) {
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: Comment.vue:184 ~ addComment ~ err:',
+                    error,
+                );
                 this.isLoading = false;
-                this.extraStore.myAlert('error', 'Error add new comment! 😭');
+                this.extraStore.myAlert(
+                    'error',
+                    error.response.data.message || 'Add comment failed!',
+                );
             }
         },
         async deleteComment(cmt) {
@@ -229,6 +238,10 @@ export default {
     },
     async mounted() {
         await this.getComments();
+        console.log(
+            '🚀 ~ file: Comment.vue:236 ~ mounted ~ this.comments:',
+            this.comments,
+        );
     },
 };
 </script>

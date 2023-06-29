@@ -1,5 +1,7 @@
 <template>
-    <div ref="artRef"></div>
+    <div
+        ref="artRef"
+        style="z-index: calc(var(--z_index_nav) - 2) !important"></div>
 </template>
 
 <script>

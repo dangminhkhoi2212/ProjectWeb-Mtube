@@ -117,7 +117,7 @@ import { useAccountStore } from '../store/account';
 import { useExtraStore } from '../store/extra';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
-import { signupRest, updateAvatarRest } from '../services/ChatEngine';
+import { signupRest, updateRest } from '../services/ChatEngine';
 
 export default {
     setup() {
@@ -157,31 +157,36 @@ export default {
             form.append('email', this.account.email);
             if (this.changePassword && this.newpassword)
                 form.append('password', this.newpassword);
-            if (this.changeAvtar && this.newimage)
-                form.append('avatar', this.newimage);
+            if (this.changeAvtar && this.newimage) {
+                form.append('image', this.newimage);
+                form.append('selectImage', 'avatar');
+            }
 
             return form;
         },
         async updateAccount() {
-            var form = this.newAccount();
-
             try {
                 this.isLoading = true;
                 this.fullPage = true;
-                await accountService.update(
-                    this.account._id,
-                    form,
-                    this.account.token,
-                );
-                await this.accountStore.getAccount();
 
-                //update avatar in ChatEngine
-                if (this.newimage)
-                    await updateAvatarRest(
-                        '@' + this.accountStore.account.username,
-                        this.accountStore.account._id,
-                        this.newimage,
-                    );
+                //update  ChatEngine
+                const formRest = new FormData();
+                formRest.append('username', '@' + this.account.username);
+                formRest.append('first_name', this.account.name);
+
+                if (this.newimage) {
+                    formRest.append('avatar', this.newimage);
+                }
+                await updateRest(
+                    '@' + this.accountStore.account.username,
+                    this.accountStore.account._id,
+                    formRest,
+                );
+                //update mongoose
+                var form = this.newAccount();
+
+                await accountService.update(this.account._id, form);
+                await this.accountStore.getAccount();
 
                 URL.revokeObjectURL(this.urlImage);
 

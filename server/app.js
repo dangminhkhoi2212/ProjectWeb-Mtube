@@ -4,7 +4,7 @@ const app = express();
 const accountRouter = require('./app/router/account.router');
 const videoRouter = require('./app/router/video.router');
 const commentRouter = require('./app/router/comment.router');
-const jwt = require('jsonwebtoken');
+
 require('dotenv').config();
 
 app.use(cors());

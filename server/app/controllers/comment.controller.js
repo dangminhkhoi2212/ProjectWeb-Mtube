@@ -1,11 +1,12 @@
 const ApiError = require('../api.error');
 const CommentModel = require('../models/Comment.model');
+const VideoModel = require('../models/Video.model');
 class Methods {
     async findAll(req, res, next) {
         try {
             const data = await CommentModel.find({
                 videoId: req.params.videoId,
-            });
+            }).populate('accountId', ['avatar', 'name', 'followers']);
             res.send(data);
         } catch (error) {
             next(
@@ -20,6 +21,13 @@ class Methods {
     async create(req, res, next) {
         try {
             const data = req.body;
+            const video = await VideoModel.findById(data.videoId);
+            if (!video.allowComment) {
+                res.status(500).json({
+                    message: 'This video blocked comment!',
+                });
+                return;
+            }
             const createdComment = await CommentModel.create(data);
             res.send(createdComment);
         } catch (error) {

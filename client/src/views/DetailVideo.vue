@@ -1,14 +1,18 @@
 <template>
-    <div class="row mt-md-0 text-break vl-parent px-2">
-        <div class="col-12 col-lg-7 col-xl-8">
+    <div
+        v-if="video"
+        class="row text-break vl-parent px-sm-5"
+        style="background-color: var(--background_main)">
+        <div
+            class="col-12 col-lg-7 col-xl-8"
+            style="background-color: var(--background_main)">
             <Artplayer v-if="urlVideo" :option="option" :style="style" />
             <div class="">
                 <p class="p-0 fs-4">
                     {{ video.title }}
                 </p>
-                <hr />
                 <div class="">
-                    <p class="fs-3">
+                    <p class="">
                         <RouterLink
                             v-if="video.accountId"
                             :to="{
@@ -17,87 +21,110 @@
                                     accountId: video.accountId._id,
                                 },
                             }">
-                            <div class="d-flex align-items-center">
-                                <AvatarCircle
-                                    class="p-2"
-                                    :src="
-                                        video.accountId.avatar.url
-                                    "></AvatarCircle>
-                                <span class="fs-5 d-inline">
-                                    {{ video.channelTitle }}
-                                </span>
-                            </div>
+                            <ProfileCard
+                                :account="video.accountId"></ProfileCard>
                         </RouterLink>
                     </p>
 
                     <div
-                        class="w-100 d-flex justify-content-around align-items-center my-4 gap-2 text-center">
-                        <div class="fs-5">
-                            <i class="fa-solid fa-eye btn-reacte rounded-4"></i
-                            >&nbsp;
-                            <span>{{ video.viewCount }}</span>
+                        class="w-100 d-flex flex-column flex-sm-row justify-content-around align-items-center my-4 gap-2 text-center">
+                        <div
+                            class="d-flex gap-5 align-items-center justify-content-between justify-content-sm-start col-12 col-sm-9">
+                            <div class="fs-5">
+                                <i
+                                    class="fa-solid fa-eye btn-reacte rounded-4"></i
+                                >&nbsp;
+                                <span>{{ video.viewCount }}</span>
+                            </div>
+                            <div class="fs-5">
+                                <i
+                                    class="fa-solid fa-heart btn-reacte rounded-4"
+                                    :class="{ like: liked }"
+                                    @click="handleLike()"></i
+                                >&nbsp;
+                                <span v-if="video.usersLike">{{
+                                    video.usersLike.length
+                                }}</span>
+                            </div>
+                            <div class="fs-5">
+                                <i
+                                    class="fa-solid fa-folder-plus btn-reacte rounded-4"
+                                    @click="addFavoriteVideo(video._id)"></i
+                                >&nbsp; <span>Favorite</span>
+                            </div>
                         </div>
-                        <div class="fs-5">
-                            <i
-                                class="fa-solid fa-heart btn-reacte rounded-4"
-                                :class="{ like: liked }"
-                                @click="handleLike()"></i
-                            >&nbsp;
-                            <span>{{ video.likeCount }}</span>
-                        </div>
-                        <div class="fs-5">
-                            <i
-                                class="fa-solid fa-folder-plus btn-reacte rounded-4"
-                                @click="addFavoriteVideo(video._id)"></i
-                            >&nbsp; <span>Favorite</span>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
                         <button
-                            class="col-5 p-2 mb-2 text-center rounded-3 fs-5"
+                            class="col-3 p-2 mb-3 text-center rounded-3 fs-5"
                             style="
                                 background-color: var(--btn);
-                                color: var(--text_title);
+                                color: var(--text);
                             "
                             @click="isShow = !isShow">
                             <span v-if="isShow">
-                                <span class="me-2">Show less</span>
+                                <span class="me-2">Less</span>
                                 <i class="fa-solid fa-caret-up"></i>
                             </span>
                             <span v-else>
-                                <span class="me-2">Show more</span>
+                                <span class="me-2">More</span>
                                 <i class="fa-solid fa-caret-down"></i>
                             </span>
                         </button>
-                        <div
-                            v-if="isShow"
-                            class="rounded-2 p-3"
-                            style="background-color: var(--bg_detail_video)">
-                            <p class="">
-                                <i class="fa-solid fa-calendar-days"></i>&nbsp;
-                                {{ video.publishedAt }}
-                            </p>
-                            <p
-                                v-if="
-                                    video.description &&
-                                    video.description !== 'undefined'
-                                "
-                                style="white-space: pre-line">
-                                {{ video.description }}
-                            </p>
-                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <Transition name="bounce">
+                            <div
+                                v-if="isShow"
+                                class="rounded-2 p-3 mb-3"
+                                style="
+                                    background-color: var(--bg_detail_video);
+                                ">
+                                <p class="">
+                                    <i class="fa-solid fa-calendar-days"></i
+                                    >&nbsp;
+                                    {{ video.publishedAt }}
+                                </p>
+                                <p
+                                    v-if="
+                                        video.description &&
+                                        video.description !== 'undefined'
+                                    "
+                                    style="white-space: pre-line">
+                                    {{ video.description }}
+                                </p>
+                            </div>
+                        </Transition>
                     </div>
                 </div>
             </div>
-            <div v-if="video.allowComment" class="col-sm-12 my-4">
-                <Comment
-                    :key="video._id"
-                    :videoId="video._id"
-                    :accountId="video.accountId._id"></Comment>
+            <div
+                v-if="
+                    video.accountId &&
+                    video.accountId._id === accountStore.account._id
+                "
+                class="float-end d-flex gap-2 align-items-center">
+                <span>Allow comment</span>
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        :checked="allowComment"
+                        @click="handleAllowComment" />
+                    <span></span>
+                </label>
             </div>
-            <div v-else class="col-sm-12 my-4 text-center">
-                <span class="fs-5">Blocked comment</span>
-            </div>
+            <Transition name="bounce">
+                <div
+                    v-if="video.allowComment && allowComment"
+                    :key="1"
+                    class="col-sm-12 my-4">
+                    <Comment
+                        :key="video._id"
+                        :video="video"
+                        :accountId="video.accountId._id"></Comment>
+                </div>
+                <div v-else :key="2" class="col-sm-12 my-4 text-center">
+                    <span class="fs-5">Blocked comment</span>
+                </div>
+            </Transition>
         </div>
 
         <div class="col-12 col-lg-5 col-xl-4 p-0 m-0">
@@ -108,13 +135,13 @@
                 :style="styleRelativeVideo"></VideoCard>
         </div>
         <loading
-            v-model:active="isLoading"
+            v-model:active="loading.isLoading"
             :can-cancel="false"
             backgroundColor="#170f23 !important"
             color="#c6bcd3"
-            :opacity="1"
+            :opacity="0.6"
             loader="bars"
-            :is-full-page="fullPage" />
+            :is-full-page="loading.isFullPage" />
     </div>
 </template>
 <script>
@@ -132,8 +159,9 @@ import VideoCard from '../components/VideoCard.vue';
 import Artplayer from '../components/Artplayer.vue';
 import alertUtil from '../utils/myAlert';
 import { convertISOTime, convertISODate } from '../utils/date.utils';
-
+import ProfileCard from '../components/ProfileCard.vue';
 import AvatarCircle from '../components/AvatarCircle.vue';
+import { formatNumber } from '../utils/format.utils';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -149,6 +177,7 @@ export default {
         VideoCard,
         Artplayer,
         AvatarCircle,
+        ProfileCard,
     },
     props: {
         id: {
@@ -158,15 +187,15 @@ export default {
     },
     data() {
         return {
-            video: {},
+            video: { type: Object, required: true },
             relaviteVideos: [],
             urlVideo: '',
-            liked: false,
-            isLoading: true,
-            fullPage: false,
-            onCancel: false,
+            liked: { type: Boolean },
+            loading: { isLoading: true, isFullPage: false },
+            accountId: this.accountStore.account._id,
             isShow: false,
             avatarChannel: '',
+            allowComment: { type: Boolean },
             option: {
                 autoplay: false,
                 pip: true,
@@ -203,31 +232,17 @@ export default {
         };
     },
     methods: {
-        async getVideo(id) {
+        async getVideo() {
             try {
-                this.video = await videoService.get(id);
-                this.format;
+                this.video = await videoService.get(this.id);
 
                 this.urlVideo = this.video.videoUpload.url;
                 this.option.url = this.urlVideo;
-
-                for (let i = 0; i < this.video.usersLike.length; i++) {
-                    if (
-                        JSON.parse(JSON.stringify(this.video.usersLike[i])) ===
-                        this.accountStore.account._id
-                    )
-                        this.liked = true;
-                }
+                this.allowComment = this.video.allowComment;
+                this.video.viewCount = formatNumber(this.video.viewCount);
+                this.video.likeCount = formatNumber(this.video.likeCount);
             } catch (err) {
                 console.log(err);
-                this.$router.push({
-                    name: 'notfound',
-                    params: {
-                        pathMatch: this.$route.path.split('/').slice(1),
-                    },
-                    query: this.$route.query,
-                    hash: this.$route.hash,
-                });
             }
         },
         async getRelativeVideo() {
@@ -258,14 +273,11 @@ export default {
                     videoId,
                 );
                 if (result.added)
-                    alertUtil.myAlert(
-                        'success',
-                        "Added into your 'My Videos' 🥳",
-                    );
+                    alertUtil.myAlert('success', "Added into your 'My Videos'");
                 else
                     alertUtil.myAlert(
                         'error',
-                        "This Video exist in your 'My Videos'😭",
+                        "This Video exist in your 'My Videos'",
                     );
             } catch (error) {
                 console.log(
@@ -274,48 +286,131 @@ export default {
                 );
             }
         },
-        async like(id, videoId) {
-            await videoService.like(id, videoId);
-            this.liked = true;
-        },
-        async unlike(id, videoId) {
-            await videoService.unlike(id, videoId);
-            this.liked = false;
+        checkLiked() {
+            return this.video.usersLike.includes(this.accountId);
         },
         async handleLike() {
-            if (!this.liked) this.liked = false;
-            else this.liked = true;
-            if (!this.liked)
-                await this.like(this.accountStore.account._id, this.video._id);
-            else
-                await this.unlike(
-                    this.accountStore.account._id,
-                    this.video._id,
+            try {
+                this.liked = !this.liked;
+                this.video = await videoService.update(this.id, {
+                    accountId: this.accountId,
+                    like: this.liked,
+                });
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: DetailVideo.vue:309 ~ handleLike ~ error:',
+                    error,
                 );
-            await this.getVideo(this.id);
+            }
+        },
+        async handleAllowComment() {
+            try {
+                this.allowComment = !this.allowComment;
+                this.video = await videoService.update(this.id, {
+                    allowComment: this.allowComment,
+                });
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: DetailVideo.vue:313 ~ handleAllowComment ~ error:',
+                    error,
+                );
+            }
+        },
+        async addView() {
+            try {
+                this.video = await videoService.update(this.id, {
+                    viewCount: Number(this.video.viewCount) + 1,
+                });
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: DetailVideo.vue:324 ~ addView ~ error:',
+                    error,
+                );
+            }
+        },
+        formatPublishAt() {
+            this.video.publishedAt = `${convertISOTime(
+                this.video.publishedAt,
+            )}, ${convertISODate(this.video.publishedAt)}`;
         },
     },
-    computed: {
-        format() {
-            this.video.likeCount = this.video.likeCount.toLocaleString('en-US');
-            this.video.viewCount = this.video.viewCount.toLocaleString('en-US');
-        },
-    },
+    computed: {},
     async mounted() {
-        await videoService.addView(this.id);
-
-        await this.getVideo(this.id);
-        this.video.publishedAt = `${convertISOTime(
-            this.video.publishedAt,
-        )}, ${convertISODate(this.video.publishedAt)}`;
-
+        await this.getVideo();
+        await this.addView();
         await this.getRelativeVideo();
-        this.isLoading = false;
+
+        this.formatPublishAt();
+
+        this.loading.isLoading = false;
     },
 };
 </script>
 <style scoped>
 .like {
     color: red;
+}
+label.switch {
+    --width_btn: 2.5rem;
+    text-align: left;
+    width: var(--width_btn);
+    height: calc(var(--width_btn) / 2);
+    border-radius: 60px;
+    background-color: var(--btn);
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+label.switch > span {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+label.switch > input[type='checkbox'] {
+    opacity: 0;
+    position: absolute;
+}
+label.switch > span:before,
+label.switch > span:after {
+    content: '';
+    cursor: pointer;
+    position: absolute;
+}
+label.switch > input[type='checkbox'] ~ span {
+    box-shadow: 0 0 0 4px var(--text_title);
+}
+label.switch > input[type='checkbox']:checked:focus ~ span {
+    box-shadow: 0 0 0 4px #fff;
+}
+label.switch > span {
+    border-radius: 60px;
+}
+label.switch > span:before {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: #f1f1f1;
+    border-radius: 60px;
+    transition: opacity 0.2s ease-out 0.1s, transform 0.2s ease-out 0.1s;
+    transform: scale(1);
+    opacity: 1;
+}
+label.switch > span:after {
+    top: 50%;
+    z-index: 3;
+    transition: transform 0.4s cubic-bezier(0.44, -0.12, 0.07, 1.15);
+    width: calc(var(--width_btn) / 2);
+    height: calc(var(--width_btn) / 2);
+    transform: translate3d(0, -50%, 0);
+    background-color: #fff;
+    border-radius: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+label.switch > input[type='checkbox']:checked ~ span:before {
+    transform: scale(0);
+    opacity: 0.7;
+}
+label.switch > input[type='checkbox']:checked ~ span:after {
+    transform: translate3d(100%, -50%, 0);
 }
 </style>

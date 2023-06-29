@@ -41,6 +41,11 @@ const routes = [
                 name: 'uploadVideo',
                 component: () => import('@/views/UploadVideo.vue'),
             },
+            {
+                path: 'connection',
+                name: 'connection',
+                component: () => import('@/views/Connection.vue'),
+            },
         ],
     },
     {
@@ -67,6 +72,11 @@ const routes = [
         component: () => import('@/views/Chat.vue'),
     },
     {
+        path: '/chatnew',
+        name: 'chatnew',
+        component: () => import('@/views/ChatNew.vue'),
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'notfound',
         component: () => import('@/views/NotFound.vue'),
@@ -79,12 +89,14 @@ const router = createRouter({
 });
 // if don't login, website will direct login page
 router.beforeEach(async (to, _from, next) => {
-    await accountStore.getAccount();
-    const account = accountStore.account;
-    const empty = accountStore.checkAccount();
-    if (!empty && !(to.name === 'login') && !(to.name === 'register')) {
+    const accountExisted = localStorage.getItem('id');
+    if (
+        !accountExisted &&
+        !(to.name === 'login') &&
+        !(to.name === 'register')
+    ) {
         next({ name: 'login' });
-    } else if (empty && to.name === 'login') next({ name: 'home' });
+    } else if (accountExisted && to.name === 'login') next({ name: 'home' });
     else next();
 });
 

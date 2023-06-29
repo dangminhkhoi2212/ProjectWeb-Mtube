@@ -26,19 +26,7 @@ router
 
 // ---------------------------------------------//
 
-router
-    .route('/editDetail/:accountId')
-    .put(verifyToken, accountController.editDetail);
-
-// ---------------------------------------------//
-
 router.route('/login').post(accountController.login);
-
-// ---------------------------------------------//
-
-router
-    .route('/updateCover/:accountId')
-    .put(verifyToken, multer.single('cover'), accountController.updateCover);
 
 // ---------------------------------------------//
 
@@ -46,12 +34,11 @@ router
     .route('/:id')
     .post(verifyToken, accountController.deleteAccount)
     .get(accountController.findById)
-    .put(verifyToken, multer.single('avatar'), accountController.updateAccount);
+    .put(verifyToken, multer.single('image'), accountController.updateAccount);
 
 // ---------------------------------------------//
 router
     .route('/')
     .get(accountController.findAll)
-    .post(multer.single('avatar'), accountController.createAccount)
-    .delete(accountController.deleteAll);
+    .post(multer.single('avatar'), accountController.createAccount);
 module.exports = router;

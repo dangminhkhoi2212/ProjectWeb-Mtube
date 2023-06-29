@@ -21,13 +21,11 @@ const signupRest = async (username, secret, email, first_name, last_name) => {
         },
     );
 };
-const updateAvatarRest = async (username, secret, avatarFile) => {
+const updateRest = async (username, secret, data) => {
     const apiUrl = 'https://api.chatengine.io/users/me/';
 
     try {
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-        const response = await axios.patch(apiUrl, formData, {
+        const response = await axios.patch(apiUrl, data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Project-ID': import.meta.env.VITE_CHAT_ENGINE_PROJECT_ID,
@@ -35,6 +33,7 @@ const updateAvatarRest = async (username, secret, avatarFile) => {
                 'User-Secret': secret,
             },
         });
+        return response;
     } catch (error) {
         console.error('Error updating avatar', error);
     }
@@ -52,4 +51,4 @@ const deleteRest = async (username, secret) => {
         console.log('🚀 ~ file: ChatEngine.js:53 ~ deleteRest ~ error:', error);
     }
 };
-export { loginRest, signupRest, updateAvatarRest, deleteRest };
+export { loginRest, signupRest, updateRest, deleteRest };

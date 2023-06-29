@@ -1,7 +1,6 @@
 <template>
     <div
-        class="row justify-content-center align-items-center overflow-auto p-3 main_container"
-        style="height: 90vh">
+        class="row justify-content-center align-items-center p-3 main_container vl-parent">
         <FormKit
             type="form"
             v-model="formData"
@@ -15,10 +14,9 @@
                         v-if="!showOptions"
                         src="../assets/images/upload_illustration.svg"
                         alt="" />
-
                     <Artplayer
                         :key="urlVideoLocal"
-                        v-else-if="urlVideoLocal"
+                        v-else
                         :option="{ ...option, url: urlVideoLocal }"
                         class="mb-3 overflow-hidden"
                         :style="{
@@ -108,13 +106,13 @@
             </div>
         </FormKit>
         <loading
-            v-model:active="isLoading"
+            v-model:active="loading.isLoading"
             :can-cancel="false"
             backgroundColor="#170f23 !important"
             color="#c6bcd3"
             :opacity="0.6"
             loader="bars"
-            :is-full-page="fullPage" />
+            :is-full-page="loading.isFullPage" />
     </div>
 </template>
 
@@ -169,6 +167,11 @@ export default {
                 airplay: true,
                 theme: '#4e2a7d',
             },
+            loading: {
+                isLoading: false,
+                isFullPage: false,
+                onCancel: false,
+            },
         };
     },
     methods: {
@@ -182,14 +185,17 @@ export default {
         },
         async handleUpload() {
             try {
-                this.isLoading = true;
-                this.fullPage = false;
+                this.loading.isLoading = true;
+                this.loading.isFullPage = false;
                 var data = JSON.parse(JSON.stringify(this.formData));
+                data.tags = data.tags.split(',');
+                data.tags = data.tags.map((tags) => tags.trim());
+
                 const form = new FormData();
                 form.append('accountId', this.accountStore.account._id);
                 form.append('publishedAt', getToDay());
                 form.append('channelTitle', this.accountStore.account.name);
-                form.append('title', data.title);
+                form.append('title', data.title.trim());
                 form.append('video', this.video);
                 form.append('description', data.description);
                 form.append('tags', data.tags);
@@ -198,11 +204,9 @@ export default {
                 form.append('category', data.category);
 
                 await videoService.create(form);
-                await alertUtils.myAlert(
-                    'success',
-                    'Successfully uploaded video',
-                );
-                this.isLoading = false;
+
+                alertUtils.myAlert('success', 'Successfully uploaded video');
+                this.loading.isLoading = false;
                 URL.revokeObjectURL(this.urlVideoLocal);
 
                 this.$router.push({ name: 'home' });
@@ -216,11 +220,15 @@ export default {
             }
         },
     },
+    mounted() {},
 };
 </script>
 
 <style>
 .main_container {
     background-image: url('../assets/images/background_videoUpload.png');
+    background-size: cover;
+    height: calc(100vh - var(--height_header));
+    overflow-y: auto;
 }
 </style>
