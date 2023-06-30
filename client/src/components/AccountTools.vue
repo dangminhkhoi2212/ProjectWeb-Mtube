@@ -94,6 +94,13 @@ export default {
     data() {
         return {};
     },
+    methods: {
+        async removeAccount() {
+            localStorage.clear();
+            this.accountStore.account = null;
+            // this.$router.push({ name: 'login' });
+        },
+    },
 };
 </script>
 

@@ -64,8 +64,8 @@ input::placeholder {
     color: var(--text);
     font-style: italic;
 }
-.formkit-messages {
-    color: red;
+.formkit-message {
+    color: #ff8989 !important;
 }
 #myFormMessage {
     color: var(--message);
@@ -74,9 +74,9 @@ input::placeholder {
     box-shadow: 0 0 0 2px red;
 }
 
-[data-complete] .formkit-inner {
+/* [data-complete] .formkit-inner {
     box-shadow: 0 0 0 3px var(--btn_hover) !important;
-}
+} */
 [data-multiple] .formkit-outer {
     background-color: blueviolet;
 }

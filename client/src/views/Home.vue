@@ -3,6 +3,7 @@
         <Carousel v-model="categoryActive"></Carousel>
         <div class="container px-1 px-lg-5" style="overflow-y: auto">
             <VideoCard
+                v-if="categoryVideos"
                 class="customArtplayer"
                 :videos="categoryVideos"
                 :style="style"
@@ -73,9 +74,7 @@ export default {
     methods: {
         async getAllVideos() {
             try {
-                this.videos = JSON.parse(
-                    JSON.stringify(await videoService.getAll()),
-                );
+                this.videos = await videoService.getAll();
             } catch (error) {
                 console.log(
                     '🚀 ~ file: Home.vue:34 ~ methods:{getAllVideos ~ error:',
@@ -91,12 +90,13 @@ export default {
         },
     },
     computed: {},
-    async created() {
+    async mounted() {
         this.loading.isLoading = true;
         await this.getAllVideos();
         this.formatDateVideo();
 
         this.categoryVideos = this.videos;
+
         this.loading.isLoading = false;
     },
 };

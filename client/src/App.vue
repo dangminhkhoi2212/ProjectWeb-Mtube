@@ -36,6 +36,7 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import Header from './components/Header.vue';
 import Navigation from './components/Navigation.vue';
+import accountService from './services/account.service';
 export default {
     setup() {
         const accountStore = useAccountStore();
@@ -57,9 +58,8 @@ export default {
         Header,
     },
     methods: {},
-    async created() {
-        if (!this.accountStore.checkAccount())
-            await this.accountStore.getAccount();
+    async mounted() {
+        await this.accountStore.getAccount();
         this.loading.isLoading = false;
     },
 };

@@ -53,9 +53,8 @@
             <div
                 class="d-flex flex-column sticky-top"
                 style="
-                    top: 70px;
-                    background-color: var(--violet_100);
-                    z-index: calc(var(--z_index_nav) -1);
+                    background-color: var(--background_main);
+                    z-index: calc(var(--z_index_nav));
                 ">
                 <div class="d-flex">
                     <div v-for="field in navFields" :key="field">
@@ -201,11 +200,9 @@
                     <div
                         class="d-flex justify-content-between align-items-center py-2 mt-2">
                         <h5>Edit Account</h5>
-                        <button class="btn">
-                            <RouterLink :to="{ name: 'editprofile' }">
-                                Go to Edit
-                            </RouterLink>
-                        </button>
+                        <RouterLink :to="{ name: 'editprofile' }">
+                            <button class="btn">Go to Edit</button>
+                        </RouterLink>
                     </div>
                     <hr />
                     <div
@@ -483,10 +480,6 @@ export default {
             let index = this.navFields.indexOf('Setting');
             this.navFields = this.navFields.splice(0, index);
         }
-        console.log(
-            '🚀 ~ file: Profile.vue:486 ~ mounted ~ this.activeField:',
-            this.activeField,
-        );
     },
 };
 </script>

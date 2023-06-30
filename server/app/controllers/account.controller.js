@@ -12,6 +12,7 @@ const {
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { video } = require('../lib/cloudinary');
+const { response } = require('express');
 require('dotenv').config();
 
 class Methods {
@@ -388,6 +389,13 @@ class Methods {
             }
             //handle password
             if (data.password) {
+                const checkPassword = await bcrypt.compare(
+                    data.currentPassword,
+                    account.password,
+                );
+                if (!checkPassword) {
+                    next(new ApiError(403, 'Invalid current password'));
+                }
                 const hashedPassword = await bcrypt.hash(data.password, 10);
                 data.password = hashedPassword;
             }
@@ -466,35 +474,55 @@ class Methods {
     async handleFollow(req, res, next) {
         try {
             const { accountIdA, accountIdB, status } = req.body;
-
             const isDifficult = accountIdA !== accountIdB;
-
+            console.log(
+                '🚀 ~ file: account.controller.js:470 ~ Methods ~ handleFollow ~  accountIdA !== accountIdB;:',
+                accountIdA !== accountIdB,
+                status,
+            );
+            var result1, result2;
             if (isDifficult) {
-                var accountA = await Account.findById(accountIdA);
-                var accountB = await Account.findById(accountIdB);
-
-                const isFollowed = accountA.following.includes(accountIdB);
-
-                if (status === 'follow' && !isFollowed) {
-                    accountA.following.push(accountIdB);
-                    accountB.followers.push(accountIdA);
-                } else if (status === 'unfollow' && isFollowed) {
-                    accountA.following = accountA.following.filter(
-                        (id) => id.toString() !== accountIdB,
+                if (status === 'follow') {
+                    result1 = await Account.findByIdAndUpdate(
+                        accountIdA,
+                        {
+                            $addToSet: {
+                                following: accountIdB,
+                            },
+                        },
+                        { new: true },
                     );
-                    accountB.followers = accountB.followers.filter(
-                        (id) => id.toString() !== accountIdA,
+                    result2 = await Account.findByIdAndUpdate(
+                        accountIdB,
+                        {
+                            $addToSet: {
+                                followers: accountIdA,
+                            },
+                        },
+                        { new: true },
+                    );
+                } else if (status === 'unfollow') {
+                    result1 = await Account.findByIdAndUpdate(
+                        accountIdA,
+                        {
+                            $pull: {
+                                following: accountIdB,
+                            },
+                        },
+                        { new: true },
+                    );
+                    result2 = await Account.findByIdAndUpdate(
+                        accountIdB,
+                        {
+                            $pull: {
+                                followers: accountIdA,
+                            },
+                        },
+                        { new: true },
                     );
                 }
 
-                await accountA.save();
-                await accountB.save();
-
-                const result = await accountB.populate({
-                    path: 'myVideos',
-                    populate: { path: 'accountId', select: 'avatar' },
-                });
-                return res.send(result);
+                return res.send(result2);
             }
             res.send("Can't follow yourself");
         } catch (error) {

@@ -99,9 +99,9 @@ export default {
                     alertUtil.myAlert('error', "Don't find your account!");
                     return;
                 }
-                localStorage.removeItem('id');
+
                 localStorage.setItem('id', this.account._id);
-                this.accountStore.account = this.account;
+                this.accountStore.updateAccount(this.account);
                 localStorage.setItem('token', this.account.token);
 
                 // Login in ChatEngine

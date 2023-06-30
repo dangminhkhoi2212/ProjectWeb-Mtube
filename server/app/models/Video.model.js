@@ -23,7 +23,7 @@ const VideoSchame = new Schema(
         viewCount: { type: Number, default: 0 },
         image: { type: String },
         description: { type: String, trim: true },
-        tags: { type: String, trim: true },
+        tags: [{ type: String, trim: true }],
         usersLike: [
             {
                 type: Schema.Types.ObjectId,

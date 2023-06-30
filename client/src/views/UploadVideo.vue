@@ -1,6 +1,6 @@
 <template>
     <div
-        class="row justify-content-center align-items-center p-3 main_container vl-parent">
+        class="row justify-content-center align-items-center p-3 main_container">
         <FormKit
             type="form"
             v-model="formData"
@@ -15,9 +15,9 @@
                         src="../assets/images/upload_illustration.svg"
                         alt="" />
                     <Artplayer
-                        :key="urlVideoLocal"
+                        :key="formData.videoUpload.url"
                         v-else
-                        :option="{ ...option, url: urlVideoLocal }"
+                        :option="{ ...option, url: formData.videoUpload.url }"
                         class="mb-3 overflow-hidden"
                         :style="{
                             height: '60vh',
@@ -25,12 +25,13 @@
                             borderRadius: 'var(--border_radius_video)',
                         }"></Artplayer>
                     <FormKit
+                        v-if="!this.formData._id"
                         type="file"
                         label="Select a video as you would like"
                         accept=".mp4"
                         name="file"
                         multiple="false"
-                        help="Note: File size is less than 10MB"
+                        help="Note: File size is less than 20MB"
                         @change="onChangeFile" />
                 </div>
                 <div
@@ -92,6 +93,7 @@
                             name="allowComment"
                             :value="true"
                             validation-visibility="dirty" />
+
                         <button
                             stype="submit "
                             class="col-4 py-2 rounded-3"
@@ -99,7 +101,8 @@
                                 background-color: var(--btn);
                                 color: var(--text);
                             ">
-                            Submit
+                            <span v-if="this.formData._id">Save</span>
+                            <span v-else>Upload</span>
                         </button>
                     </div>
                 </div>
@@ -132,6 +135,9 @@ export default {
         const accountStore = useAccountStore();
         return { accountStore };
     },
+    props: {
+        videoEdit: { type: Object },
+    },
     components: {
         VideoController,
         Loading,
@@ -141,7 +147,11 @@ export default {
         return {
             urlVideoLocal: '',
             title: '',
-            formData: {},
+            formData: {
+                videoUpload: {
+                    url: '',
+                },
+            },
             video: null,
             isLoading: false,
             fullPage: true,
@@ -177,19 +187,33 @@ export default {
     methods: {
         onChangeFile(e) {
             this.video = e.target.files[0];
-            URL.revokeObjectURL(this.urlVideoLocal);
-            this.urlVideoLocal = URL.createObjectURL(e.target.files[0]);
+
+            URL.revokeObjectURL(this.formData.videoUpload.url);
+            this.formData.videoUpload.url = URL.createObjectURL(
+                e.target.files[0],
+            );
             setTimeout(() => {
                 this.showOptions = true;
             }, 100);
         },
         async handleUpload() {
             try {
+                if (this.formData._id) {
+                    this.handleEdit();
+                    return;
+                }
                 this.loading.isLoading = true;
-                this.loading.isFullPage = false;
                 var data = JSON.parse(JSON.stringify(this.formData));
-                data.tags = data.tags.split(',');
-                data.tags = data.tags.map((tags) => tags.trim());
+                if ('tags' in data) {
+                    data.tags = data.tags.split(',');
+                    data.tags = data.tags.filter((tags) => tags.trim() !== '');
+                    data.tags.forEach((tags) => {
+                        console.log(
+                            '🚀 ~ file: UploadVideo.vue:197 ~ data.tags.forEach ~ tags:',
+                            tags,
+                        );
+                    });
+                }
 
                 const form = new FormData();
                 form.append('accountId', this.accountStore.account._id);
@@ -197,30 +221,67 @@ export default {
                 form.append('channelTitle', this.accountStore.account.name);
                 form.append('title', data.title.trim());
                 form.append('video', this.video);
-                form.append('description', data.description);
-                form.append('tags', data.tags);
+                if (data.description)
+                    form.append('description', data.description);
+                if (data.tags) {
+                    for (let i = 0; i < data.tags.length; i++) {
+                        form.append(`tags[${i}]`, data.tags[i]);
+                    }
+                }
                 form.append('region', data.region);
                 form.append('allowComment', data.allowComment);
                 form.append('category', data.category);
 
                 await videoService.create(form);
 
-                alertUtils.myAlert('success', 'Successfully uploaded video');
                 this.loading.isLoading = false;
-                URL.revokeObjectURL(this.urlVideoLocal);
+                alertUtils.myAlert('success', 'Successfully uploaded video');
+                URL.revokeObjectURL(this.formData.videoUpload.url);
 
                 this.$router.push({ name: 'home' });
+            } catch (error) {
+                console.log(
+                    '🚀 ~ file: UploadVideo.vue:242 ~ handleUpload ~ error:',
+                    error,
+                );
+                alertUtils.myAlert(
+                    'error',
+                    error.response.data ||
+                        error.response.data.message ||
+                        error.message ||
+                        error,
+                );
+
+                this.loading.isLoading = false;
+            }
+        },
+        async handleEdit() {
+            try {
+                this.loading.isLoading = true;
+                await videoService.update(this.formData._id, this.formData);
+                this.loading.isLoading = false;
+                alertUtils.myAlert('success', 'Successfully Edit video');
+                this.$router.push({
+                    name: 'detail',
+                    params: { id: this.formData._id },
+                });
             } catch (error) {
                 console.error(error);
                 alertUtils.myAlert(
                     'error',
                     error.response.data.message || error.message,
                 );
-                this.isLoading = false;
+                this.loading.isLoading = false;
             }
         },
     },
-    mounted() {},
+    mounted() {
+        if (this.$route.query.videoEdit) {
+            this.formData = JSON.parse(this.$route.query.videoEdit);
+
+            this.showOptions = true;
+        }
+    },
 };
 </script>
 
@@ -230,5 +291,22 @@ export default {
     background-size: cover;
     height: calc(100vh - var(--height_header));
     overflow-y: auto;
+}
+[data-type='checkbox'] .formkit-input ~ .formkit-decorator,
+[data-type='radio'] .formkit-input ~ .formkit-decorator,
+[data-type='checkbox'] .formkit-input:focus ~ .formkit-decorator,
+[data-type='checkbox'] .formkit-input:checked ~ .formkit-decorator,
+[data-type='radio'] .formkit-input:checked ~ .formkit-decorator {
+    box-shadow: 0 0 2px 2px var(--btn_hover);
+}
+
+[data-type='checkbox'] .formkit-input:checked ~ .formkit-decorator {
+    box-shadow: 0;
+}
+[data-type='checkbox']
+    .formkit-input:checked
+    ~ .formkit-decorator
+    .formkit-icon {
+    color: var(--text) !important;
 }
 </style>

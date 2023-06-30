@@ -1,4 +1,8 @@
-import { createWebHistory, createRouter } from 'vue-router';
+import {
+    createWebHistory,
+    createRouter,
+    createWebHashHistory,
+} from 'vue-router';
 import pinia from '../store/defineStore';
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
@@ -83,7 +87,7 @@ const routes = [
     },
 ];
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHashHistory(import.meta.env.BASE_URL),
     linkExactActiveClass: 'active_nav',
     routes,
 });

@@ -18,7 +18,7 @@
                 placeholder="Add a comment..."
                 aria-label="Bình luận về video"
                 v-model="content"
-                @keyup.enter="addComment()"></textarea>
+                @keydown="handleComment"></textarea>
             <button
                 class="rounded-1 h-100 text-center"
                 data-bs-toggle="modal"
@@ -168,11 +168,21 @@ export default {
                 console.log(err);
             }
         },
-        async addComment() {
-            if (this.commentOfUser.textOriginal.trim().length == 0) {
-                return;
+        async handleComment(event) {
+            if (event.key === 'Enter' && event.shiftKey) {
+                // Handle Shift + Enter (add line break)
+                this.content += '\n';
+                event.preventDefault(); // Prevents the default behavior (submitting the form)
+            } else if (event.key === 'Enter') {
+                // Handle Enter (submit comment)
+                await this.addComment();
             }
+        },
+        async addComment() {
             try {
+                if (this.commentOfUser.textOriginal.trim().length == 0) {
+                    return;
+                }
                 this.isLoading = true;
                 await commentService.create(this.commentOfUser);
                 await this.getComments();
@@ -222,7 +232,6 @@ export default {
                         showConfirmButton: false,
                         timer: 1500,
                     });
-                    console.log(err);
                 }
             }
         },
@@ -238,10 +247,6 @@ export default {
     },
     async mounted() {
         await this.getComments();
-        console.log(
-            '🚀 ~ file: Comment.vue:236 ~ mounted ~ this.comments:',
-            this.comments,
-        );
     },
 };
 </script>

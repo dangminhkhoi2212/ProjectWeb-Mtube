@@ -106,9 +106,55 @@
                                             this.accountStore.account._id)
                                 "
                                 class="text-center border-0 col-1">
-                                <i
-                                    class="fa-solid fa-trash btn-reacte rounded-3"
-                                    @click.prevent="removeVideo(video._id)"></i>
+                                <div class="dropdown">
+                                    <button
+                                        class="dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="true"></button>
+                                    <ul class="dropdown-menu">
+                                        <router-link
+                                            v-if="
+                                                isProfile &&
+                                                video.accountId._id ===
+                                                    this.accountStore.account
+                                                        ._id
+                                            "
+                                            :to="{
+                                                name: 'uploadVideo',
+                                                query: {
+                                                    videoEdit: JSON.stringify({
+                                                        _id: video._id,
+                                                        title: video.title,
+                                                        description:
+                                                            video.description,
+                                                        videoUpload:
+                                                            video.videoUpload,
+                                                        tags: video.tags,
+                                                        allowComment:
+                                                            video.allowComment,
+                                                        category:
+                                                            video.category,
+                                                        region: video.region,
+                                                    }),
+                                                },
+                                            }"
+                                            ><li
+                                                class="dropdown-item"
+                                                style="color: var(--text)">
+                                                Edit
+                                            </li>
+                                        </router-link>
+                                        <li
+                                            class="dropdown-item"
+                                            style="color: var(--text)"
+                                            @click.prevent="
+                                                removeVideo(video._id)
+                                            ">
+                                            Delete
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -149,6 +195,7 @@ export default {
             isDetailPage: this.$route.name === 'detail',
             isFavoriteVideo: this.$route.name === 'favorite',
             isProfile: this.$route.name === 'profile',
+            accountId: this.accountStore.account._id,
         };
     },
     methods: {

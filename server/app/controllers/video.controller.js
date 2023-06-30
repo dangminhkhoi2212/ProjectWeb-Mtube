@@ -111,7 +111,7 @@ class Methods {
                     result = await VideoModel.findByIdAndUpdate(
                         videoId,
                         {
-                            $push: { usersLike: data.accountId },
+                            $addToSet: { usersLike: data.accountId },
                         },
                         { new: true },
                     ).populate(options);

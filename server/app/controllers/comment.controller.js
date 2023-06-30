@@ -6,7 +6,10 @@ class Methods {
         try {
             const data = await CommentModel.find({
                 videoId: req.params.videoId,
-            }).populate('accountId', ['avatar', 'name', 'followers']);
+            })
+                .sort('-publishedAt')
+                .populate('accountId', ['avatar', 'name', 'followers']);
+
             res.send(data);
         } catch (error) {
             next(

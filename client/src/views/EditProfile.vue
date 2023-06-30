@@ -51,6 +51,12 @@
                     <div v-if="changePassword">
                         <FormKit
                             type="password"
+                            name="current_password"
+                            label="Enter your password"
+                            validation-visibility="live"
+                            v-model="oldpassword" />
+                        <FormKit
+                            type="password"
                             name="password"
                             value="super-secret"
                             label="Enter a new password"
@@ -131,6 +137,7 @@ export default {
             account: this.accountStore.account,
             newimage: '',
             newpassword: '',
+            oldpassword: '',
             changeAvtar: false,
             changePassword: false,
             urlImage: this.accountStore.account.avatar.url,
@@ -155,8 +162,10 @@ export default {
             form.append('name', this.account.name);
             form.append('username', this.account.username);
             form.append('email', this.account.email);
-            if (this.changePassword && this.newpassword)
+            if (this.changePassword && this.newpassword) {
+                form.append('currentPassword', this.oldpassword);
                 form.append('password', this.newpassword);
+            }
             if (this.changeAvtar && this.newimage) {
                 form.append('image', this.newimage);
                 form.append('selectImage', 'avatar');
@@ -191,7 +200,8 @@ export default {
                 URL.revokeObjectURL(this.urlImage);
 
                 this.changePassword = false;
-                this.account.password = null;
+                this.oldpassword = null;
+                this.newpassword = null;
                 this.changeAvtar = false;
                 this.isLoading = false;
 
@@ -199,10 +209,7 @@ export default {
             } catch (error) {
                 this.isLoading = false;
                 console.log(error);
-                this.extraStore.myAlert(
-                    'error',
-                    error.response.data.message || error.response.data,
-                );
+                this.extraStore.myAlert('error', 'Refresh page and retry');
             }
         },
     },

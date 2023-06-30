@@ -241,6 +241,7 @@ export default {
                 this.allowComment = this.video.allowComment;
                 this.video.viewCount = formatNumber(this.video.viewCount);
                 this.video.likeCount = formatNumber(this.video.likeCount);
+                this.checkLiked();
             } catch (err) {
                 console.log(err);
             }
@@ -287,7 +288,7 @@ export default {
             }
         },
         checkLiked() {
-            return this.video.usersLike.includes(this.accountId);
+            this.liked = this.video.usersLike.includes(this.accountId);
         },
         async handleLike() {
             try {
@@ -296,6 +297,8 @@ export default {
                     accountId: this.accountId,
                     like: this.liked,
                 });
+                this.checkLiked();
+                this.formatPublishAt();
             } catch (error) {
                 console.log(
                     '🚀 ~ file: DetailVideo.vue:309 ~ handleLike ~ error:',
@@ -335,7 +338,7 @@ export default {
         },
     },
     computed: {},
-    async mounted() {
+    async created() {
         await this.getVideo();
         await this.addView();
         await this.getRelativeVideo();

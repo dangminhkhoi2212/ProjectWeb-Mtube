@@ -94,9 +94,9 @@ export default {
         },
         async removeFavoriteVideo(videoId) {
             const confirm = await alertUtil.myConfirm(
-                'Are you sure?',
+                'Are you sure',
                 'warning',
-                "You won't be able to revert this!",
+                'You want to remove this favorite video',
                 'Yes, delete it!',
             );
             if (confirm) {

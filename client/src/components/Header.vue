@@ -68,11 +68,6 @@ export default {
     },
     components: { NavigationMobile, AvatarCircle, AccountTools },
     methods: {
-        async removeAccount() {
-            localStorage.clear();
-            this.accountStore.account = null;
-            // this.$router.push({ name: 'login' });
-        },
         gotoSearch(input) {
             this.videoStore.updateInputSearch(this.inputSearch);
             if (input) {
