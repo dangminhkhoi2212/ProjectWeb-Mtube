@@ -54,7 +54,7 @@
                 class="d-flex flex-column sticky-top"
                 style="
                     background-color: var(--background_main);
-                    z-index: calc(var(--z_index_nav));
+                    z-index: calc(var(--z_index_nav) - 1);
                 ">
                 <div class="d-flex">
                     <div v-for="field in navFields" :key="field">

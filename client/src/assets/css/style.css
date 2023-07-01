@@ -84,26 +84,7 @@ input::placeholder {
     color: var(--text) !important;
 }
 /* -------------- */
-.dropdown button {
-    border: none;
-    outline: none;
-    border-radius: 5px;
-    padding: 0.5rem 0.8rem;
-    background-color: var(--btn);
-    color: white;
-}
 
-.dropdown-menu {
-    background-color: var(--btn);
-}
-
-.dropdown-menu li {
-    color: var(--text);
-}
-
-.dropdown-menu li:hover {
-    background-color: var(--btn);
-}
 .space {
     position: absolute;
     top: var(--height_header);

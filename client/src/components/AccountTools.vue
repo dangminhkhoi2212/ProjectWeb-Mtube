@@ -21,7 +21,8 @@
                 class="dropdown-toggle"
                 type="button"
                 data-bs-toggle="dropdown"
-                aria-expanded="true"></button>
+                aria-expanded="true"
+                @click="stopPropagation"></button>
             <ul class="dropdown-menu">
                 <router-link
                     :to="{
@@ -92,16 +93,41 @@ export default {
     },
     components: { AvatarCircle },
     data() {
-        return {};
+        return {
+            isShow: false,
+        };
     },
     methods: {
-        async removeAccount() {
+        removeAccount() {
             localStorage.clear();
             this.accountStore.account = null;
-            // this.$router.push({ name: 'login' });
+        },
+        stopPropagation(e) {
+            e.stopPropagation();
         },
     },
 };
 </script>
 
-<style scoped></style>
+<style>
+.dropdown button {
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    padding: 0.5rem 0.8rem;
+    background-color: var(--btn);
+    color: white;
+}
+
+.dropdown-menu {
+    background-color: var(--btn);
+}
+
+.dropdown-menu li {
+    color: var(--text);
+}
+
+.dropdown-menu li:hover {
+    background-color: var(--btn);
+}
+</style>

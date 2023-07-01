@@ -81,16 +81,19 @@ export default {
                 this.videos = await accountService.getFavoriteVideos(
                     this.accountStore.account._id,
                 );
-                this.videos = this.videos.map((video) => {
-                    video.publishedAt = convertISODate(video.publishedAt);
-                    return video;
-                });
+                this.formatDateVideo();
             } catch (error) {
                 console.log(
                     '🚀 ~ file: FavoriteVideo.vue:50 ~ getFavoriteVideos ~ error:',
                     error,
                 );
             }
+        },
+        formatDateVideo() {
+            this.videos = this.videos.map((video) => {
+                video.publishedAt = convertISODate(video.publishedAt);
+                return video;
+            });
         },
         async removeFavoriteVideo(videoId) {
             const confirm = await alertUtil.myConfirm(
@@ -112,6 +115,7 @@ export default {
                         'success',
                         'Your video has been deleted.',
                     );
+                    this.formatDateVideo();
                     this.loading.isLoading = false;
                 } catch (error) {
                     alertUtil.myAlert('Error!', "Don't delete this video! ");
@@ -138,6 +142,7 @@ export default {
                         'success',
                         'All videos has been deleted.',
                     );
+
                     this.loading.isLoading = false;
                 } catch (error) {
                     alertUtil.myAlert(

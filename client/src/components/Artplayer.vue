@@ -1,7 +1,7 @@
 <template>
     <div
         ref="artRef"
-        style="z-index: calc(var(--z_index_nav) - 2) !important"></div>
+        style="z-index: calc(var(--z_index_nav) - 3) !important"></div>
 </template>
 
 <script>

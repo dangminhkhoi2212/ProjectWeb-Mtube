@@ -57,8 +57,9 @@ class AccountService {
         return (await this.api.put(`/favorite/${accountId}/${videoId}`)).data;
     }
     async removeFavoriteVideo(accountId, videoId) {
-        return (await this.api.delete(`/favorite/${accountId}/${videoId}`))
-            .data;
+        return (
+            await this.api.delete(`/favorite/${accountId}/${videoId}`, config)
+        ).data;
     }
     async removeAllFavoriteVideos(accountId) {
         return (await this.api.delete(`/favorite/${accountId}`)).data;
@@ -67,8 +68,9 @@ class AccountService {
         return (await this.api.put(`/myVideos/${id}/${videoId}`)).data;
     }
     async removeMyVideo(accountId, videoId) {
-        return (await this.api.delete(`/myVideos/${accountId}/${videoId}`))
-            .data;
+        return (
+            await this.api.delete(`/myVideos/${accountId}/${videoId}`, config)
+        ).data;
     }
     async removeAllVideo(id) {
         return (await this.api.delete(`/myVideos/${id}`)).data;
