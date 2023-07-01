@@ -1,7 +1,7 @@
 import createApiClient from './api.service';
 
 class CommentService {
-    constructor(baseUrl = 'comment') {
+    constructor(baseUrl = 'https://alive-visor.cyclic.app/comment') {
         this.api = createApiClient(baseUrl);
     }
     async getAll(videoId) {

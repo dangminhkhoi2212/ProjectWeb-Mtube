@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const ApiError = require('../api.error');
 const maxSize = 10 * 1024 * 1024;
 // Multer config
 module.exports = multer({
@@ -18,7 +19,7 @@ module.exports = multer({
             ext !== '.docx' &&
             ext !== '.doc'
         ) {
-            cb(new Error('File type is not supported'), false);
+            cb(new ApiError(403, 'File type is not supported'), false);
             return;
         }
         cb(null, true);
