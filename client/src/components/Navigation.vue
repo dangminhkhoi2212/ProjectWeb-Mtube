@@ -61,15 +61,13 @@
 </template>
 <script>
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
 import { useExtraStore } from '../store/extra';
 import AccountTools from './AccountTools.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
-        const videoStore = useVideoStore();
         const extraStore = useExtraStore();
-        return { accountStore, videoStore, extraStore };
+        return { accountStore, extraStore };
     },
     components: {
         AccountTools,

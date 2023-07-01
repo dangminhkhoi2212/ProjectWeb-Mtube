@@ -1,11 +1,7 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import pinia from '../store/defineStore';
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
-import { useExtraStore } from '../store/extra';
 const accountStore = useAccountStore(pinia);
-const videoStore = useVideoStore(pinia);
-const extraStore = useExtraStore(pinia);
 
 const routes = [
     {

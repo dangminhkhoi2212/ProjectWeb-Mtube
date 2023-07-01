@@ -21,7 +21,6 @@
 </template>
 <script>
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
 import { convertISODate } from '../utils/date.utils';
 
 import Carousel from '../components/Carousel.vue';
@@ -34,8 +33,7 @@ import Loading from 'vue-loading-overlay';
 export default {
     setup() {
         const accountStore = useAccountStore();
-        const videoStore = useVideoStore();
-        return { accountStore, videoStore };
+        return { accountStore };
     },
     components: {
         Carousel,

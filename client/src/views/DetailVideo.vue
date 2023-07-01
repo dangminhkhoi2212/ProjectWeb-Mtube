@@ -151,7 +151,6 @@ import Navigation from '../components/Navigation.vue';
 import Comment from '../components/Comment.vue';
 import Header from '../components/Header.vue';
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
 import { useExtraStore } from '../store/extra';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
@@ -165,9 +164,8 @@ import { formatNumber } from '../utils/format.utils';
 export default {
     setup() {
         const accountStore = useAccountStore();
-        const videoStore = useVideoStore();
         const extraStore = useExtraStore();
-        return { accountStore, videoStore, extraStore };
+        return { accountStore, extraStore };
     },
     components: {
         Navigation,

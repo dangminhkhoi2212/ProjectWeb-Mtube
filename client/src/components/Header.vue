@@ -50,15 +50,13 @@
 
 <script>
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
 import AvatarCircle from './AvatarCircle.vue';
 import NavigationMobile from './NavigationMobile.vue';
 import AccountTools from './AccountTools.vue';
 export default {
     setup() {
         const accountStore = useAccountStore();
-        const videoStore = useVideoStore();
-        return { accountStore, videoStore };
+        return { accountStore };
     },
     data() {
         return {

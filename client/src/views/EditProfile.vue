@@ -205,7 +205,7 @@ export default {
                 this.changeAvtar = false;
                 this.isLoading = false;
 
-                this.extraStore.myAlert('success', ' Updated successfully 🥳');
+                this.extraStore.myAlert('success', ' Updated successfully');
             } catch (error) {
                 this.isLoading = false;
                 console.log(error);

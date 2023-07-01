@@ -6,10 +6,9 @@ const config = {
         Authorization: `Bearer ${token}`,
     },
 };
-console.log('🚀 ~ file: account.service.js:9 ~ config:', config);
 
 class AccountService {
-    constructor(baseUrl = '/account') {
+    constructor(baseUrl = 'https://alive-visor.cyclic.app/account') {
         this.api = createApiClient(baseUrl);
     }
     async getAll(searchCriteria) {

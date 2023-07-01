@@ -41,7 +41,6 @@ import Header from '../components/Header.vue';
 import Navigation from '../components/Navigation.vue';
 import accountService from '../services/account.service';
 import { useAccountStore } from '../store/account';
-import { useVideoStore } from '../store/video';
 import Artplayer from '../components/Artplayer.vue';
 import VideoCard from '../components/VideoCard.vue';
 import Loading from 'vue-loading-overlay';
@@ -50,8 +49,7 @@ import { convertISODate } from '../utils/date.utils';
 export default {
     setup() {
         const accountStore = useAccountStore();
-        const videoStore = useVideoStore();
-        return { accountStore, videoStore };
+        return { accountStore };
     },
     components: {
         Navigation,

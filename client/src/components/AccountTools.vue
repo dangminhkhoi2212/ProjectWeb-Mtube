@@ -120,7 +120,7 @@ export default {
 }
 
 .dropdown-menu {
-    background-color: var(--btn);
+    background-color: var(--btn) !important;
 }
 
 .dropdown-menu li {
