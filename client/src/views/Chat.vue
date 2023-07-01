@@ -31,23 +31,25 @@
 
 <script>
 import { PrettyChatWindow } from 'react-chat-engine-pretty';
-
 import { applyReactInVue } from 'veaury';
 import { useAccountStore } from '../store/account';
+
 export default {
-    setup() {
-        const accountStore = useAccountStore();
-        return { accountStore };
-    },
-    data() {
-        return {
-            projectId: import.meta.env.VITE_CHAT_ENGINE_PROJECT_ID,
-            username: '@' + this.accountStore.account.username,
-            secret: this.accountStore.account._id,
-        };
-    },
     components: {
         PrettyChatWindow: applyReactInVue(PrettyChatWindow),
+    },
+    setup() {
+        const accountStore = useAccountStore();
+
+        const projectId = import.meta.env.VITE_CHAT_ENGINE_PROJECT_ID;
+        const username = '@' + accountStore.account.username;
+        const secret = accountStore.account._id;
+
+        return {
+            projectId,
+            username,
+            secret,
+        };
     },
 };
 </script>

@@ -55,4 +55,7 @@ export const useAccountStore = defineStore('account', {
                 });
         },
     },
+    persist: {
+        enabled: true,
+    },
 });

@@ -93,7 +93,7 @@ export default {
     async mounted() {
         this.loading.isLoading = true;
         await this.getAllVideos();
-        this.formatDateVideo();
+        await this.formatDateVideo();
 
         this.categoryVideos = this.videos;
 

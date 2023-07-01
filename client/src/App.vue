@@ -59,8 +59,8 @@ export default {
     },
     methods: {},
     async mounted() {
-        await this.accountStore.getAccount();
-        this.loading.isLoading = false;
+        if (!this.accountStore.checkAccount())
+            await this.accountStore.getAccount();
     },
 };
 </script>

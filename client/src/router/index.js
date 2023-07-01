@@ -1,8 +1,4 @@
-import {
-    createWebHistory,
-    createRouter,
-    createWebHashHistory,
-} from 'vue-router';
+import { createWebHistory, createRouter } from 'vue-router';
 import pinia from '../store/defineStore';
 import { useAccountStore } from '../store/account';
 import { useVideoStore } from '../store/video';
@@ -76,9 +72,9 @@ const routes = [
         component: () => import('@/views/Chat.vue'),
     },
     {
-        path: '/chatnew',
-        name: 'chatnew',
-        component: () => import('@/views/ChatNew.vue'),
+        path: '/chat',
+        name: 'chat',
+        component: () => import('@/views/Chat.vue'),
     },
     {
         path: '/:pathMatch(.*)*',
@@ -87,13 +83,15 @@ const routes = [
     },
 ];
 const router = createRouter({
-    history: createWebHashHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(import.meta.env.BASE_URL),
     linkExactActiveClass: 'active_nav',
     routes,
 });
 // if don't login, website will direct login page
 router.beforeEach(async (to, _from, next) => {
     const accountExisted = localStorage.getItem('id');
+    if (!accountStore.checkAccount()) await accountStore.getAccount();
+
     if (
         !accountExisted &&
         !(to.name === 'login') &&
