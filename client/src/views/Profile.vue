@@ -51,10 +51,10 @@
         </div>
         <div class="py-4">
             <div
-                class="d-flex flex-column sticky-top"
+                class="d-flex flex-column sticky-top h-100"
                 style="
                     background-color: var(--background_main);
-                    z-index: calc(var(--z_index_nav) - 1);
+                    z-index: calc(var(--z_index_nav));
                 ">
                 <div class="d-flex">
                     <div v-for="field in navFields" :key="field">
@@ -126,33 +126,62 @@
                     <div class="row">
                         <h5>Media</h5>
                         <div
-                            class="d-flex flex-column flex-sm-row justify-content-around gap-3">
-                            <a target="_blank" :href="account.media.facebook">
-                                <i
-                                    class="fs-3 rounded-5 p-2 fa-brands fa-facebook"></i>
-                            </a>
-                            <input
-                                v-if="isEditDetails"
-                                type="text"
-                                v-model="account.media.facebook" />
+                            class="d-flex flex-column justify-content-start gap-2 overflow-hidden">
+                            <div class="d-flex gap-2 align-items-center">
+                                <a
+                                    target="_blank"
+                                    :href="account.media.facebook">
+                                    <i
+                                        class="fs-3 rounded-5 p-2 fa-brands fa-facebook"></i>
+                                </a>
+                                <input
+                                    v-if="isEditDetails"
+                                    type="text"
+                                    v-model="account.media.facebook" />
+                                <span
+                                    class="text-truncate"
+                                    :title="account.media.facebook"
+                                    v-else
+                                    >{{ account.media.facebook }}</span
+                                >
+                            </div>
                             <!-- ---------------------------------------------------------->
-                            <a target="_blank" :href="account.media.instagram">
-                                <i
-                                    class="fs-3 rounded-5 p-2 fa-brands fa-instagram"></i>
-                            </a>
-                            <input
-                                v-if="isEditDetails"
-                                type="text"
-                                v-model="account.media.instagram" />
+                            <div class="d-flex gap-2 align-items-center">
+                                <a
+                                    target="_blank"
+                                    :href="account.media.instagram">
+                                    <i
+                                        class="fs-3 rounded-5 p-2 fa-brands fa-instagram"></i>
+                                </a>
+                                <input
+                                    v-if="isEditDetails"
+                                    type="text"
+                                    v-model="account.media.instagram" />
+                                <span
+                                    class="text-truncate"
+                                    :title="account.media.instagram"
+                                    v-else
+                                    >{{ account.media.instagram }}</span
+                                >
+                            </div>
+
                             <!-- ---------------------------------------------------------->
-                            <a target="_blank" :href="account.media.tiktok">
-                                <i
-                                    class="fs-3 rounded-5 p-2 fa-brands fa-tiktok"></i>
-                            </a>
-                            <input
-                                v-if="isEditDetails"
-                                type="text"
-                                v-model="account.media.tiktok" />
+                            <div class="d-flex gap-2 align-items-center">
+                                <a target="_blank" :href="account.media.tiktok">
+                                    <i
+                                        class="fs-3 rounded-5 p-2 fa-brands fa-tiktok"></i>
+                                </a>
+                                <input
+                                    v-if="isEditDetails"
+                                    type="text"
+                                    v-model="account.media.tiktok" />
+                                <span
+                                    class="text-truncate"
+                                    :title="account.media.tiktok"
+                                    v-else
+                                    >{{ account.media.tiktok }}</span
+                                >
+                            </div>
                         </div>
                         <hr class="my-2" />
                     </div>
@@ -165,7 +194,7 @@
                                 background-color: var(--btn);
                                 color: var(--text);
                             ">
-                            <span>
+                            <span :title="account.media.instagram">
                                 <i
                                     class="fs-4 mx-2 fa-regular fa-pen-to-square"></i
                                 >Edit details
@@ -477,8 +506,7 @@ export default {
         if (this.chooseField) this.activeField = this.chooseField;
         //remove button settings
         if (!this.isProfile) {
-            let index = this.navFields.indexOf('Setting');
-            this.navFields = this.navFields.splice(0, index);
+            this.navFields = this.navFields.filter((nav) => nav !== 'Settings');
         }
     },
 };

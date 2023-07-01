@@ -67,7 +67,6 @@ export default {
     components: { NavigationMobile, AvatarCircle, AccountTools },
     methods: {
         gotoSearch(input) {
-            this.videoStore.updateInputSearch(this.inputSearch);
             if (input) {
                 this.$router.push({
                     name: 'search',

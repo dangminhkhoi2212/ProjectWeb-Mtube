@@ -16,28 +16,29 @@
             </div>
         </div>
         <hr class="m-0" />
-        <VideoCard
-            v-if="videos.length > 0 && activeField === 'Videos'"
-            :key="this.$route.params.textSearch"
-            :videos="videos"
-            :option="option"
-            :style="style"
-            class="customArtplayer"></VideoCard>
-        <div
-            v-else-if="accounts.length > 0 && activeField === 'Channels'"
-            class="d-flex justify-content-center flex-wrap gap-2 gap-sm-5 my-3">
-            <ProfileCard
-                v-for="account in accounts"
-                :account="account"></ProfileCard>
-        </div>
 
-        <div
-            v-else
-            class="d-flex justify-content-center align-items-center my-3">
-            <h4 style="font-style: italic">
-                Didn't find any videos or channels
+        <div v-if="activeField === 'Videos'">
+            <VideoCard
+                v-if="videos.length > 0"
+                :key="this.$route.params.textSearch"
+                :videos="videos"
+                :option="option"
+                :style="style"
+                class="customArtplayer"></VideoCard>
+            <h4 v-else class="text-center my-3" style="font-style: italic">
+                Didn't find any videos
             </h4>
         </div>
+        <div
+            v-else-if="activeField === 'Channels'"
+            class="d-flex justify-content-center flex-wrap gap-2 gap-sm-5 my-3">
+            <ProfileCard
+                v-if="accounts.length > 0"
+                v-for="account in accounts"
+                :account="account"></ProfileCard>
+            <h4 v-else style="font-style: italic">Didn't find any channels</h4>
+        </div>
+
         <Loading
             v-model:active="loading.isLoading"
             :can-cancel="loading.onCancel"
