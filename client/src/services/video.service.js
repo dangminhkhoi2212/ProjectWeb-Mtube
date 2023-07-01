@@ -1,7 +1,7 @@
 import createApiClient from './api.service';
 
 class VideoService {
-    constructor(baseUrl = '/video') {
+    constructor(baseUrl = 'https://alive-visor.cyclic.app/video') {
         this.api = createApiClient(baseUrl);
     }
     async getAll(searchCriteria) {

@@ -2,8 +2,8 @@ import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-const url_local = 'http://localhost:3000';
-// const url_local = 'https://alive-visor.cyclic.app/';
+// const url_local = 'http://localhost:3000';
+const url_local = 'https://alive-visor.cyclic.app/';
 
 export default defineConfig({
     plugins: [vue()],

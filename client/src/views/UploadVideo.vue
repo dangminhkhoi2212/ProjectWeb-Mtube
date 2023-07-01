@@ -240,6 +240,10 @@ export default {
 
                 this.$router.push({ name: 'home' });
             } catch (error) {
+                console.log(
+                    '🚀 ~ file: UploadVideo.vue:243 ~ handleUpload ~ error:',
+                    error,
+                );
                 alertUtils.myAlert(
                     'error',
                     error.response.data.message || 'Reload page and try again',
