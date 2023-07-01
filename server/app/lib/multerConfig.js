@@ -5,7 +5,7 @@ const maxSize = 10 * 1024 * 1024;
 // Multer config
 module.exports = multer({
     storage: multer.diskStorage({}),
-    limits: { fileSize: maxSize },
+    limits: { fileSize: maxSize, fieldSize: maxSize },
     fileFilter: (req, file, cb) => {
         let ext = path.extname(file.originalname);
         if (
