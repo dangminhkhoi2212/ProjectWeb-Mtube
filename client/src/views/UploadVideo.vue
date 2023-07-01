@@ -31,7 +31,7 @@
                         accept=".mp4"
                         name="file"
                         multiple="false"
-                        help="Note: File size is less than 20MB"
+                        help="Note: File size is less than 10MB"
                         @change="onChangeFile" />
                 </div>
                 <div
@@ -240,16 +240,9 @@ export default {
 
                 this.$router.push({ name: 'home' });
             } catch (error) {
-                console.log(
-                    '🚀 ~ file: UploadVideo.vue:242 ~ handleUpload ~ error:',
-                    error,
-                );
                 alertUtils.myAlert(
                     'error',
-                    error.response.data ||
-                        error.response.data.message ||
-                        error.message ||
-                        error,
+                    error.response.data.message || 'Reload page and try again',
                 );
 
                 this.loading.isLoading = false;
@@ -266,7 +259,6 @@ export default {
                     params: { id: this.formData._id },
                 });
             } catch (error) {
-                console.error(error);
                 alertUtils.myAlert(
                     'error',
                     error.response.data.message || error.message,

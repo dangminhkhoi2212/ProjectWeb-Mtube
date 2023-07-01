@@ -109,9 +109,10 @@ export default {
                 this.loading.isLoading = false;
                 this.$router.push({ name: 'home' });
             } catch (err) {
+                console.log('🚀 ~ file: Login.vue:112 ~ gotoHome ~ err:', err);
                 this.loading.isLoading = false;
 
-                alertUtil.myAlert('error', err.response.data.message);
+                alertUtil.myAlert('error', 'Login failed! Please retry');
             }
         },
     },

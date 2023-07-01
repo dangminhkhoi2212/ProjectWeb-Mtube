@@ -85,9 +85,10 @@ const router = createRouter({
 });
 // if don't login, website will direct login page
 router.beforeEach(async (to, _from, next) => {
+    if (!accountStore.checkAccount() && localStorage.getItem('id'))
+        await accountStore.getAccount();
     const accountExisted =
         localStorage.getItem('id') && accountStore.checkAccount();
-    if (!accountStore.checkAccount()) await accountStore.getAccount();
 
     if (
         !accountExisted &&

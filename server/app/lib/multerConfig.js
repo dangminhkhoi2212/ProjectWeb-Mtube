@@ -1,7 +1,6 @@
 const multer = require('multer');
 const path = require('path');
-const { getVideoDurationInSeconds } = require('get-video-duration');
-const maxSize = 20 * 1024 * 1024;
+const maxSize = 10 * 1024 * 1024;
 // Multer config
 module.exports = multer({
     storage: multer.diskStorage({}),

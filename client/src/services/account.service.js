@@ -8,7 +8,7 @@ const config = {
 };
 
 class AccountService {
-    constructor(baseUrl = 'https://alive-visor.cyclic.app/account') {
+    constructor(baseUrl = '/account') {
         this.api = createApiClient(baseUrl);
     }
     async getAll(searchCriteria) {
