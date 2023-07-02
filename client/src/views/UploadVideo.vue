@@ -31,8 +31,15 @@
                         accept=".mp4"
                         name="file"
                         multiple="false"
-                        help="Note: File size is less than 10MB"
+                        help="Note: File size is less than 20MB"
                         @change="onChangeFile" />
+                    <span
+                        v-if="showOptions"
+                        :class="
+                            fileSize <= 20.0 ? 'text-success' : 'text-danger'
+                        "
+                        >File size: {{ fileSize }} MB</span
+                    >
                 </div>
                 <div
                     v-if="showOptions"
@@ -157,6 +164,7 @@ export default {
             fullPage: true,
             onCancel: false,
             showOptions: false,
+            fileSize: 0,
             option: {
                 autoplay: false,
                 pip: true,
@@ -187,7 +195,7 @@ export default {
     methods: {
         onChangeFile(e) {
             this.video = e.target.files[0];
-
+            this.fileSize = (this.video.size / (1024 * 1024)).toFixed(2);
             URL.revokeObjectURL(this.formData.videoUpload.url);
             this.formData.videoUpload.url = URL.createObjectURL(
                 e.target.files[0],
@@ -200,6 +208,10 @@ export default {
             try {
                 if (this.formData._id) {
                     this.handleEdit();
+                    return;
+                }
+                if (this.fileSize > 20.0) {
+                    alertUtils.myAlert('error', 'File too large');
                     return;
                 }
                 this.loading.isLoading = true;
@@ -240,13 +252,9 @@ export default {
 
                 this.$router.push({ name: 'home' });
             } catch (error) {
-                console.log(
-                    '🚀 ~ file: UploadVideo.vue:243 ~ handleUpload ~ error:',
-                    error,
-                );
                 alertUtils.myAlert(
                     'error',
-                    error.response.data.message || 'Reload page and try again',
+                    'Check file size or try again after in a few minutes',
                 );
 
                 this.loading.isLoading = false;
@@ -304,5 +312,11 @@ export default {
     ~ .formkit-decorator
     .formkit-icon {
     color: var(--text) !important;
+}
+.text-danger {
+    color: rgb(240, 80, 80) !important;
+}
+.text-success {
+    color: rgb(6, 213, 106) !important;
 }
 </style>

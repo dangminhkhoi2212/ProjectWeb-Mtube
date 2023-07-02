@@ -8,7 +8,7 @@ const config = {
 };
 
 class AccountService {
-    constructor(baseUrl = 'https://alive-visor.cyclic.app/account') {
+    constructor(baseUrl = '/account') {
         this.api = createApiClient(baseUrl);
     }
     async getAll(searchCriteria) {
@@ -18,14 +18,12 @@ class AccountService {
         return (await this.api.post('/', data)).data;
     }
     async deleteAll() {
-        return (await this.api.delete('/')).data;
+        return (await this.api.delete('/', config)).data;
     }
     async getAccount(id) {
         return (await this.api.get(`/${id}`)).data;
     }
-    async getAvatar(id) {
-        return (await this.api.get(`/avatar/${id}`)).data;
-    }
+
     async getLogin(username, password) {
         return (
             await this.api.post(`/login`, {
@@ -50,10 +48,11 @@ class AccountService {
             .data;
     }
     async getFavoriteVideos(id) {
-        return (await this.api.get(`/favorite/${id}`)).data;
+        return (await this.api.get(`/favorite/${id}`, config)).data;
     }
     async addFavoriteVideo(accountId, videoId) {
-        return (await this.api.put(`/favorite/${accountId}/${videoId}`)).data;
+        return (await this.api.put(`/favorite/${accountId}/${videoId}`, config))
+            .data;
     }
     async removeFavoriteVideo(accountId, videoId) {
         return (
@@ -61,10 +60,10 @@ class AccountService {
         ).data;
     }
     async removeAllFavoriteVideos(accountId) {
-        return (await this.api.delete(`/favorite/${accountId}`)).data;
+        return (await this.api.delete(`/favorite/${accountId}`, config)).data;
     }
     async addVideo(id, videoId) {
-        return (await this.api.put(`/myVideos/${id}/${videoId}`)).data;
+        return (await this.api.put(`/myVideos/${id}/${videoId}`, config)).data;
     }
     async removeMyVideo(accountId, videoId) {
         return (
@@ -72,7 +71,7 @@ class AccountService {
         ).data;
     }
     async removeAllVideo(id) {
-        return (await this.api.delete(`/myVideos/${id}`)).data;
+        return (await this.api.delete(`/myVideos/${id}`, config)).data;
     }
     async handleFollow(accountIdA, accountIdB, status) {
         return (

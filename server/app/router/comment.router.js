@@ -1,18 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const commentController = require('../controllers/comment.controller');
+const verifyToken = require('../middleware/account.middleware');
 
 router
     .route('/:videoId')
     .get(commentController.findAll)
-    .delete(commentController.deleteAll);
+    .delete(verifyToken, commentController.deleteAll);
 router
     .route('/one/:id')
     .get(commentController.findOne)
-    .put(commentController.update)
-    .delete(commentController.delete);
+    .put(verifyToken, commentController.update)
+    .delete(verifyToken, commentController.delete);
 router
     .route('/')
-    .post(commentController.create)
-    .delete(commentController.deleteAll);
+    .post(verifyToken, commentController.create)
+    .delete(verifyToken, commentController.deleteAll);
 module.exports = router;

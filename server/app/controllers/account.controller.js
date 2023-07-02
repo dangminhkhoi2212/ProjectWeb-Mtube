@@ -334,7 +334,6 @@ class Methods {
             const account = await AccountModel.findById(id);
             const methods = new Methods();
             const selectImage = req.body.selectImage;
-
             //handle name, username, email
             if (
                 'name' in data && // check field existed in data
@@ -400,7 +399,7 @@ class Methods {
                 data.password = hashedPassword;
             }
 
-            const result = await Account.findByIdAndUpdate(
+            const dataResult = await Account.findByIdAndUpdate(
                 id,
                 { $set: data },
                 {
@@ -413,7 +412,7 @@ class Methods {
                     populate: { path: 'accountId', select: 'avatar' },
                 });
 
-            return res.send(result);
+            return res.send(dataResult);
         } catch (error) {
             next(new ApiError(error.code, error));
         }

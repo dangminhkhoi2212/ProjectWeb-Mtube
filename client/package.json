@@ -30,7 +30,7 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
+    "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.0.0"
   }
 }

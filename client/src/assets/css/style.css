@@ -60,7 +60,8 @@ select {
     border: none;
     border-radius: 5px;
 }
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
     color: var(--text);
     font-style: italic;
 }

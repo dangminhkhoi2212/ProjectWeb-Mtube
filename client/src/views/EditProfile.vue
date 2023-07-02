@@ -209,7 +209,10 @@ export default {
             } catch (error) {
                 this.isLoading = false;
                 console.log(error);
-                this.extraStore.myAlert('error', 'Refresh page and retry');
+                this.extraStore.myAlert(
+                    'error',
+                    error.response.data.message ?? error.message,
+                );
             }
         },
     },

@@ -4,25 +4,27 @@ const accountController = require('../controllers/account.controller');
 const multer = require('../lib/multerConfig');
 const verifyToken = require('../middleware/account.middleware');
 
-router.route('/handleFollow').put(accountController.handleFollow);
+router.route('/handleFollow').put(verifyToken, accountController.handleFollow);
 
 // ---------------------------------------------//
 
 router
     .route('/favorite/:id')
-    .get(accountController.getFavorite)
-    .delete(accountController.removeAllFavoriteVideo);
+    .get(verifyToken, accountController.getFavorite)
+    .delete(verifyToken, accountController.removeAllFavoriteVideo);
 router
     .route('/favorite/:id/:videoId')
-    .put(accountController.addFavoriteVideo)
-    .delete(accountController.removeFavoriteVideo);
+    .put(verifyToken, accountController.addFavoriteVideo)
+    .delete(verifyToken, accountController.removeFavoriteVideo);
 
 // ---------------------------------------------//
 
-router.route('/myVideos/:id').delete(accountController.removeAllVideo);
+router
+    .route('/myVideos/:id')
+    .delete(verifyToken, accountController.removeAllVideo);
 router
     .route('/myVideos/:accountId/:videoId')
-    .delete(accountController.removeMyVideo);
+    .delete(verifyToken, accountController.removeMyVideo);
 
 // ---------------------------------------------//
 

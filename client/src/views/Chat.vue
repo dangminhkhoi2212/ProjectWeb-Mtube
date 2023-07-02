@@ -34,12 +34,12 @@
 
 <script>
 import { PrettyChatWindow } from 'react-chat-engine-pretty';
-import { applyReactInVue } from 'veaury';
+import { applyPureReactInVue } from 'veaury';
 import { useAccountStore } from '../store/account';
 
 export default {
     components: {
-        PrettyChatWindow: applyReactInVue(PrettyChatWindow),
+        PrettyChatWindow: applyPureReactInVue(PrettyChatWindow),
     },
     setup() {
         const accountStore = useAccountStore();
